@@ -1,88 +1,61 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { mockStudents } from '../data/mockStudents';
+import { createContext, useContext, useState, useCallback } from 'react';
 
-const AuthContext = createContext();
+const AuthContext = createContext(null);
 
-export const demoProfiles = {
-  student: {
-    role: 'student',
-    name: 'Aarav Sharma',
-    avatar: 'AS',
-    email: 'aarav.sharma@ves.ac.in',
-    college: "Vivekanand Education Society's College (VESASC)",
-    branch: 'Information Technology',
-    graduationYear: 2026,
-    cgpa: 8.84,
-    headline: 'Aspiring Full Stack Engineer | SIH Contributor',
-  },
-  company: {
-    role: 'company',
-    name: 'Rajesh Iyer',
-    avatar: 'RI',
-    email: 'rajesh.iyer@razorpay.com',
-    companyName: 'Razorpay',
-    companyInitials: 'RZ',
-    title: 'Lead Campus Talent Acquisition Partner',
-    industry: 'FinTech / Payments Infrastructure',
-    activeListings: 4,
-  },
-  admin: {
-    role: 'admin',
-    name: 'Dr. Pradeep Sengupta',
-    avatar: 'PS',
-    email: 'placement.director@ves.ac.in',
-    institution: 'VESASC / Directorate of Technical Education',
-    designation: 'Dean of Career Development & Placement Affairs',
-    roleLabel: 'Institutional Admin & SIH Nodal Officer',
-  }
-};
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-export const AuthProvider = ({ children }) => {
-  // Check localStorage or default to student for quick demo evaluation
-  const [currentUser, setCurrentUser] = useState(() => {
-    const savedRole = localStorage.getItem('kv_demo_role');
-    if (savedRole && demoProfiles[savedRole]) {
-      return demoProfiles[savedRole];
-    }
-    return demoProfiles.student;
-  });
+  const login = useCallback((role, email) => {
+    const profiles = {
+      student: {
+        id: 's1',
+        name: 'Rahul Sharma',
+        email: email || 'rahul.sharma@example.com',
+        role: 'student',
+        college: 'IIT Bombay',
+        degree: 'B.Tech Computer Science',
+        branch: 'Computer Science',
+        graduationYear: 2025,
+        cgpa: 8.7,
+        location: 'Mumbai, Maharashtra',
+        avatar: null,
+        profileCompletion: 85,
+        placementReadiness: 78,
+        skillScore: 82,
+      },
+      company: {
+        id: 'c1',
+        name: 'TechVista Solutions',
+        email: email || 'careers@techvista.example.com',
+        role: 'company',
+        industry: 'IT Services',
+        location: 'Bengaluru, Karnataka',
+        size: '500-1000',
+        profileCompletion: 88,
+      },
+      admin: {
+        id: 'admin1',
+        name: 'Dr. Suresh Menon',
+        email: email || 'admin@kaushalverse.example.com',
+        role: 'admin',
+        institution: 'IIT Bombay',
+      },
+    };
+    setUser(profiles[role] || profiles.student);
+  }, []);
 
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
-
-  const loginAs = (role) => {
-    if (demoProfiles[role]) {
-      setCurrentUser(demoProfiles[role]);
-      setIsAuthenticated(true);
-      localStorage.setItem('kv_demo_role', role);
-    }
-  };
-
-  const logout = () => {
-    setCurrentUser(null);
-    setIsAuthenticated(false);
-    localStorage.removeItem('kv_demo_role');
-  };
+  const logout = useCallback(() => setUser(null), []);
 
   return (
-    <AuthContext.Provider
-      value={{
-        currentUser,
-        role: currentUser?.role || 'guest',
-        isAuthenticated,
-        loginAs,
-        logout,
-        demoProfiles,
-      }}
-    >
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export function useAuth() {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
+  return ctx;
+}

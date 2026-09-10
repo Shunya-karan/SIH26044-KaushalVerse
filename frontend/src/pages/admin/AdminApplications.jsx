@@ -1,35 +1,51 @@
-import React from 'react';
-import { PageHeader } from '../../components/common/PageHeader';
-import { Badge } from '../../components/ui';
-import { useApp } from '../../context/AppContext';
+import { FileText } from 'lucide-react';
+import { PageHeader } from '@/components/common/Shared';
+import { Card, Badge, Avatar } from '@/components/ui';
+import { mockApplications } from '@/data/mockApplications';
 
-export const AdminApplications = () => {
-  const { applicantCandidates } = useApp();
+const statusVariant = {
+  'Applied': 'warning', 'Under Review': 'info', 'Shortlisted': 'primary',
+  'Interview': 'violet', 'Selected': 'success', 'Rejected': 'error',
+};
 
+export default function AdminApplications() {
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Cross-Institutional Application Pipeline"
-        subtitle="Monitor application throughput and corporate selection ratios."
-        breadcrumbs={[{ label: 'Dashboard', link: '/admin/dashboard' }, { label: 'Applications Flow' }]}
-      />
+      <PageHeader title="Applications" subtitle="Platform-wide application tracking" icon={FileText} />
 
-      <div className="bg-surface rounded-2xl border border-border p-6 shadow-subtle space-y-4">
-        <h3 className="text-sm font-bold text-main">Active Submissions (Cross-College)</h3>
-        <div className="space-y-3">
-          {applicantCandidates.map((c) => (
-            <div key={c.id} className="p-4 rounded-xl bg-slate-50 border border-border flex items-center justify-between text-xs">
-              <div>
-                <p className="font-bold text-main">{c.studentName} &bull; {c.roleApplied}</p>
-                <p className="text-subtext text-[11px]">{c.college} &bull; Match: <strong>{c.matchScore}%</strong></p>
-              </div>
-              <Badge variant={c.status === 'Shortlisted' ? 'secondary' : 'default'}>
-                {c.status}
-              </Badge>
-            </div>
-          ))}
+      <Card className="overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-bg border-b border-border">
+              <tr>
+                <th className="text-left px-4 py-3 font-medium text-text-secondary">Student</th>
+                <th className="text-left px-4 py-3 font-medium text-text-secondary">Company</th>
+                <th className="text-left px-4 py-3 font-medium text-text-secondary">Role</th>
+                <th className="text-left px-4 py-3 font-medium text-text-secondary">Match</th>
+                <th className="text-left px-4 py-3 font-medium text-text-secondary">Applied</th>
+                <th className="text-left px-4 py-3 font-medium text-text-secondary">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {mockApplications.map(a => (
+                <tr key={a.id} className="hover:bg-bg/50">
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <Avatar name={a.studentName} size="sm" />
+                      <span className="font-medium text-main">{a.studentName}</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-text-secondary">{a.company}</td>
+                  <td className="px-4 py-3 text-text-secondary">{a.role}</td>
+                  <td className="px-4 py-3"><span className="font-semibold text-primary">{a.matchScore}%</span></td>
+                  <td className="px-4 py-3 text-text-secondary">{a.appliedDate}</td>
+                  <td className="px-4 py-3"><Badge variant={statusVariant[a.status]}>{a.status}</Badge></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      </div>
+      </Card>
     </div>
   );
-};
+}

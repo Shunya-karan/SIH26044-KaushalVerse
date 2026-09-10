@@ -1,53 +1,72 @@
-import React from 'react';
-import { PageHeader } from '../../components/common/PageHeader';
-import { Button, Badge } from '../../components/ui';
-import { Building2, MapPin, Globe, Mail, Users, CheckCircle2 } from 'lucide-react';
+import { Building2, Globe, MapPin, Mail, Phone, Edit3 } from 'lucide-react';
+import { PageHeader } from '@/components/common/Shared';
+import { Card, Badge, Button, Avatar, Progress, Input } from '@/components/ui';
+import { mockCompanies } from '@/data/mockCompanies';
 
-export const CompanyProfile = () => {
+export default function CompanyProfile() {
+  const company = mockCompanies[0];
+
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <PageHeader
-        title="Company Profile"
-        subtitle="Organization identity, campus talent relations, and enterprise verification."
-        breadcrumbs={[{ label: 'Dashboard', link: '/company/dashboard' }, { label: 'Profile' }]}
-      />
+    <div className="space-y-6">
+      <PageHeader title="Company Profile" subtitle="Manage your company information and branding" icon={Building2} />
 
-      <div className="bg-surface rounded-2xl border border-border p-6 sm:p-8 shadow-subtle space-y-6">
-        <div className="flex items-start gap-4">
-          <div className="w-16 h-16 rounded-2xl bg-slate-900 text-amber-300 text-xl font-bold flex items-center justify-center shadow-md shrink-0">
-            RZ
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-2xl font-bold text-main">Razorpay Software Private Limited</h2>
-              <Badge variant="success">Verified Recruiter</Badge>
+      <Card className="p-6">
+        <div className="flex flex-col sm:flex-row items-start gap-5">
+          <Avatar name={company.name} size="xl" />
+          <div className="flex-1">
+            <h2 className="text-xl font-bold text-main">{company.name}</h2>
+            <p className="text-sm text-text-secondary mt-0.5">{company.industry} · {company.size} employees</p>
+            <div className="mt-3 flex flex-wrap gap-4 text-sm text-text-secondary">
+              <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4" />{company.location}</span>
+              <span className="flex items-center gap-1.5"><Globe className="w-4 h-4" />{company.website}</span>
+              <span className="flex items-center gap-1.5"><Mail className="w-4 h-4" />{company.contactEmail}</span>
             </div>
-            <p className="text-xs text-primary font-semibold mt-0.5">FinTech / Digital Payments Infrastructure</p>
-            <p className="text-xs text-subtext mt-1 max-w-xl">
-              Powering developer-first payment gateways, neo-banking accounts, and institutional payroll across India.
-            </p>
           </div>
+          <Button variant="secondary" size="sm"><Edit3 className="w-4 h-4" />Edit</Button>
         </div>
+        <div className="mt-5 pt-5 border-t border-border">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium text-main">Profile Completion</span>
+            <span className="text-sm font-semibold text-primary">{company.profileCompletion}%</span>
+          </div>
+          <Progress value={company.profileCompletion} color="primary" />
+        </div>
+      </Card>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-border text-xs">
-          <div>
-            <span className="text-subtext">Official Website</span>
-            <p className="font-semibold text-main">https://razorpay.com</p>
+      <div className="grid lg:grid-cols-2 gap-6">
+        <Card className="p-6">
+          <h3 className="font-semibold text-main mb-4">Company Information</h3>
+          <div className="space-y-4">
+            <Input label="Company Name" defaultValue={company.name} />
+            <Input label="Industry" defaultValue={company.industry} />
+            <Input label="Website" defaultValue={company.website} />
+            <Input label="Location" defaultValue={company.location} />
+            <div>
+              <label className="label">About</label>
+              <textarea className="input" rows={4} defaultValue={company.about} />
+            </div>
           </div>
-          <div>
-            <span className="text-subtext">HQ & Regional Locations</span>
-            <p className="font-semibold text-main">Bengaluru &bull; Mumbai &bull; Delhi NCR</p>
+        </Card>
+
+        <Card className="p-6">
+          <h3 className="font-semibold text-main mb-4">Contact Information</h3>
+          <div className="space-y-4">
+            <Input label="Contact Person" defaultValue={company.contactName} />
+            <Input label="Contact Email" defaultValue={company.contactEmail} />
+            <Input label="Contact Phone" defaultValue={company.contactPhone} />
+            <Input label="Company Size" defaultValue={company.size} />
           </div>
-          <div>
-            <span className="text-subtext">Company Size</span>
-            <p className="font-semibold text-main">1,000 – 5,000 Employees</p>
+          <div className="mt-6 pt-6 border-t border-border">
+            <h4 className="text-sm font-semibold text-main mb-3">Company Stats</h4>
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <div className="rounded-lg border border-border p-3"><p className="text-xl font-bold text-primary">{company.opportunities}</p><p className="text-xs text-text-secondary">Opportunities</p></div>
+              <div className="rounded-lg border border-border p-3"><p className="text-xl font-bold text-info">{company.applications}</p><p className="text-xs text-text-secondary">Applications</p></div>
+              <div className="rounded-lg border border-border p-3"><p className="text-xl font-bold text-success">5</p><p className="text-xs text-text-secondary">Placed</p></div>
+            </div>
           </div>
-          <div>
-            <span className="text-subtext">Campus Relations Desk</span>
-            <p className="font-semibold text-main">campus-relations@razorpay.com</p>
-          </div>
-        </div>
+          <div className="mt-4 flex justify-end"><Button>Save Changes</Button></div>
+        </Card>
       </div>
     </div>
   );
-};
+}

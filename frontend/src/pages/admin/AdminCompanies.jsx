@@ -1,49 +1,61 @@
-import React from 'react';
-import { PageHeader } from '../../components/common/PageHeader';
-import { Button, Badge } from '../../components/ui';
-import { mockCompanies } from '../../data/mockCompanies';
-import { Building2, CheckCircle2 } from 'lucide-react';
-import { toast } from 'sonner';
+import { Building2, Search, Eye, Ban } from 'lucide-react';
+import { PageHeader } from '@/components/common/Shared';
+import { Card, Badge, Button, Avatar, Input } from '@/components/ui';
+import { mockCompanies } from '@/data/mockCompanies';
 
-export const AdminCompanies = () => {
+export default function AdminCompanies() {
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Corporate Hiring Partners"
-        subtitle="Vetted enterprise recruiters offering internships, live capstones, and campus placements."
-        breadcrumbs={[{ label: 'Dashboard', link: '/admin/dashboard' }, { label: 'Companies' }]}
-      />
+      <PageHeader title="Company Management" subtitle="View and manage all registered companies" icon={Building2} />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {mockCompanies.map((comp) => (
-          <div key={comp.id} className="bg-surface rounded-2xl border border-border p-6 shadow-subtle space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white text-xs shadow-xs"
-                  style={{ backgroundColor: comp.color || '#0F766E' }}
-                >
-                  {comp.initials}
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-main">{comp.name}</h3>
-                  <p className="text-[11px] text-subtext">{comp.industry}</p>
-                </div>
-              </div>
-              <Badge variant="success">MOU Active</Badge>
-            </div>
-
-            <p className="text-xs text-subtext line-clamp-2">{comp.about}</p>
-
-            <div className="pt-3 border-t border-border flex items-center justify-between text-xs">
-              <span className="text-subtext">Active Listings: <strong>{comp.activeOpportunitiesCount}</strong></span>
-              <Button variant="outline" size="sm" onClick={() => toast.info(`Contacting ${comp.name}`)}>
-                Campus Desk
-              </Button>
-            </div>
-          </div>
-        ))}
+      <div className="relative max-w-md">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+        <Input placeholder="Search by company name or industry..." className="pl-10" />
       </div>
+
+      <Card className="overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-bg border-b border-border">
+              <tr>
+                <th className="text-left px-4 py-3 font-medium text-text-secondary">Company</th>
+                <th className="text-left px-4 py-3 font-medium text-text-secondary">Industry</th>
+                <th className="text-left px-4 py-3 font-medium text-text-secondary">Location</th>
+                <th className="text-left px-4 py-3 font-medium text-text-secondary">Opportunities</th>
+                <th className="text-left px-4 py-3 font-medium text-text-secondary">Applications</th>
+                <th className="text-left px-4 py-3 font-medium text-text-secondary">Status</th>
+                <th className="text-right px-4 py-3 font-medium text-text-secondary">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {mockCompanies.map(c => (
+                <tr key={c.id} className="hover:bg-bg/50">
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <Avatar name={c.name} size="sm" />
+                      <div>
+                        <p className="font-medium text-main">{c.name}</p>
+                        <p className="text-xs text-text-muted">{c.size} employees</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-text-secondary">{c.industry}</td>
+                  <td className="px-4 py-3 text-text-secondary">{c.location}</td>
+                  <td className="px-4 py-3 text-text-secondary">{c.opportunities}</td>
+                  <td className="px-4 py-3 text-text-secondary">{c.applications}</td>
+                  <td className="px-4 py-3"><Badge variant="success">{c.status}</Badge></td>
+                  <td className="px-4 py-3">
+                    <div className="flex justify-end gap-1">
+                      <Button variant="ghost" size="sm"><Eye className="w-4 h-4" /></Button>
+                      <Button variant="ghost" size="sm" className="text-error"><Ban className="w-4 h-4" /></Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
     </div>
   );
-};
+}

@@ -1,57 +1,63 @@
-import React from 'react';
-import { PageHeader } from '../../components/common/PageHeader';
-import { mockAnalytics } from '../../data/mockAnalytics';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { TrendingUp, AlertTriangle } from 'lucide-react';
+import { TrendingUp, Flame, BarChart3 } from 'lucide-react';
+import { PageHeader } from '@/components/common/Shared';
+import { Card, Badge } from '@/components/ui';
+import { SkillDemandChart, SkillRadarChart, SimpleBarChart, DemandPieChart } from '@/components/charts';
+import { skillDemandData, emergingSkills, skillSupplyData, industryDistribution, roleDemandData } from '@/data/mockAnalytics';
 
-export const SkillTrends = () => {
+export default function SkillTrends() {
+  const radarData = skillSupplyData.map(s => ({ skill: s.skill, current: s.supply, required: s.demand }));
+
   return (
-    <div className="space-y-8">
-      <PageHeader
-        title="Macro Skill Demand Trends"
-        subtitle="Empirical analytics comparing actual corporate job description requirements against current college course supply."
-        breadcrumbs={[{ label: 'Dashboard', link: '/admin/dashboard' }, { label: 'Skill Trends' }]}
-      />
+    <div className="space-y-6">
+      <PageHeader title="Skill Trends" subtitle="Industry skill demand, supply and gap analysis" icon={TrendingUp} />
 
-      <div className="bg-surface rounded-2xl border border-border p-6 sm:p-8 shadow-subtle space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-base font-bold text-main">Industry Demand vs Curriculum Supply (Top 8 Tech Areas)</h3>
-            <p className="text-xs text-subtext">Significant negative gaps warrant curriculum revision or supplemental bootcamps.</p>
+      <div className="grid lg:grid-cols-2 gap-6">
+        <Card className="p-6">
+          <h3 className="font-semibold text-main mb-1 flex items-center gap-2"><TrendingUp className="w-4 h-4 text-primary" />Top Industry Skills</h3>
+          <p className="text-xs text-text-muted mb-4">Demand score by skill across all industries</p>
+          <SkillDemandChart data={skillDemandData} height={300} />
+        </Card>
+
+        <Card className="p-6">
+          <h3 className="font-semibold text-main mb-1 flex items-center gap-2"><Flame className="w-4 h-4 text-accent" />Emerging Skills</h3>
+          <p className="text-xs text-text-muted mb-4">Fastest growing skills year-over-year</p>
+          <div className="space-y-3">
+            {emergingSkills.map(s => (
+              <div key={s.skill} className="flex items-center justify-between">
+                <span className="text-sm font-medium text-main">{s.skill}</span>
+                <Badge variant="accent">+{s.growth}%</Badge>
+              </div>
+            ))}
           </div>
-        </div>
+        </Card>
 
-        <div className="h-80 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={mockAnalytics.topSkillsDemandVsSupply} barGap={4}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis dataKey="skill" tick={{ fontSize: 11, fill: '#64748b' }} />
-              <YAxis tick={{ fontSize: 11, fill: '#64748b' }} />
-              <Tooltip />
-              <Bar dataKey="demand" fill="#0F766E" radius={[4, 4, 0, 0]} name="Industry Demand" />
-              <Bar dataKey="supply" fill="#059669" radius={[4, 4, 0, 0]} name="College Supply" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
+        <Card className="p-6">
+          <h3 className="font-semibold text-main mb-1 flex items-center gap-2"><BarChart3 className="w-4 h-4 text-primary" />Skill Demand vs Supply</h3>
+          <p className="text-xs text-text-muted mb-4">Radar comparison of student skill supply vs industry demand</p>
+          <SkillRadarChart data={radarData} height={300} />
+        </Card>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="p-5 rounded-2xl bg-surface border border-border space-y-2">
-          <span className="text-xs font-bold text-accent uppercase">Fastest Growing</span>
-          <p className="text-xl font-bold text-main">FHIR / ABDM Tech</p>
-          <p className="text-xs text-subtext leading-relaxed">+62% YoY demand driven by national health data modernization.</p>
-        </div>
-        <div className="p-5 rounded-2xl bg-surface border border-border space-y-2">
-          <span className="text-xs font-bold text-primary uppercase">Core Essential</span>
-          <p className="text-xl font-bold text-main">React & JavaScript</p>
-          <p className="text-xs text-subtext leading-relaxed">Present in 92% of all junior full stack & frontend job postings.</p>
-        </div>
-        <div className="p-5 rounded-2xl bg-surface border border-border space-y-2">
-          <span className="text-xs font-bold text-roadmap uppercase">Primary Curriculum Gap</span>
-          <p className="text-xl font-bold text-main">Docker & CI/CD</p>
-          <p className="text-xs text-subtext leading-relaxed">44% supply deficit between student familiarity and industry hiring requisites.</p>
-        </div>
+        <Card className="p-6">
+          <h3 className="font-semibold text-main mb-1">Skill Supply vs Demand</h3>
+          <p className="text-xs text-text-muted mb-4">Bar comparison showing gap</p>
+          <SimpleBarChart data={skillSupplyData} xKey="skill" bars={[
+            { key: 'supply', color: '#0F766E', label: 'Student Supply' },
+            { key: 'demand', color: '#F97316', label: 'Industry Demand' },
+          ]} height={300} />
+        </Card>
+
+        <Card className="p-6">
+          <h3 className="font-semibold text-main mb-1">Role Demand</h3>
+          <p className="text-xs text-text-muted mb-4">Open positions by role</p>
+          <SimpleBarChart data={roleDemandData} xKey="role" bars={[{ key: 'demand', color: '#7C3AED', label: 'Openings' }]} height={280} />
+        </Card>
+
+        <Card className="p-6">
+          <h3 className="font-semibold text-main mb-1">Industry Distribution</h3>
+          <p className="text-xs text-text-muted mb-4">Opportunity distribution by industry</p>
+          <DemandPieChart data={industryDistribution} height={280} />
+        </Card>
       </div>
     </div>
   );
-};
+}

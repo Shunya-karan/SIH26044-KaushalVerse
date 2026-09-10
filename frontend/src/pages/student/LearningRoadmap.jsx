@@ -1,136 +1,82 @@
-import React from 'react';
-import { PageHeader } from '../../components/common/PageHeader';
-import { Button, Badge } from '../../components/ui';
-import { useApp } from '../../context/AppContext';
-import { learningRoadmapTemplates } from '../../data/mockSkills';
-import { Compass, CheckCircle2, Clock, BookOpen, ExternalLink, Sparkles, Award } from 'lucide-react';
+import { Route, CheckCircle2, Clock, Circle, BookOpen, Zap } from 'lucide-react';
+import { PageHeader } from '@/components/common/Shared';
+import { Card, Badge, Progress } from '@/components/ui';
+import { learningRoadmap } from '@/data/mockAnalytics';
 
-export const LearningRoadmap = () => {
-  const { currentTargetRole } = useApp();
-  const phases = learningRoadmapTemplates['role-fullstack'];
+export default function LearningRoadmap() {
+  const statusConfig = {
+    'Completed': { icon: CheckCircle2, color: 'text-success', bg: 'bg-green-100', badge: 'success' },
+    'In Progress': { icon: Clock, color: 'text-violet', bg: 'bg-violet-light', badge: 'violet' },
+    'Upcoming': { icon: Circle, color: 'text-text-muted', bg: 'bg-slate-100', badge: 'default' },
+  };
 
   return (
-    <div className="space-y-8">
-      <PageHeader
-        title="Personalized Learning Roadmap"
-        subtitle="Step-by-step modular progression tailored to bridge your specific skill gaps for your target career."
-        breadcrumbs={[{ label: 'Dashboard', link: '/student/dashboard' }, { label: 'Roadmap' }]}
-        badge={
-          <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-purple-50 text-roadmap border border-purple-200">
-            <Sparkles className="w-3.5 h-3.5" />
-            Recommendation Preview (SIH Prototype)
-          </span>
-        }
-      />
+    <div className="space-y-6">
+      <PageHeader title="Learning Roadmap" subtitle="Personalized recommendation preview — your path to becoming a Full Stack Developer" icon={Route} />
 
-      {/* Pathway Overview Header */}
-      <div className="bg-surface rounded-2xl border border-border p-6 sm:p-8 shadow-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-        <div>
-          <span className="text-xs font-bold uppercase tracking-wider text-roadmap">Goal Orientation</span>
-          <h2 className="text-2xl font-bold text-main mt-1">{currentTargetRole.title} Pathway</h2>
-          <p className="text-xs text-subtext mt-1 max-w-xl">
-            5 structured phases bridging client interfaces, database optimization, and cloud containerization with accredited, free study modules.
-          </p>
+      <Card className="p-5 bg-violet-light/30 border-violet/20">
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded-lg bg-violet text-white flex items-center justify-center shrink-0">
+            <Zap className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-main">Goal: Become a Full Stack Developer</h3>
+            <p className="text-sm text-text-secondary mt-1">Estimated total duration: 29 weeks · 5 phases · Personalized recommendation preview</p>
+          </div>
         </div>
+      </Card>
 
-        <div className="p-4 rounded-xl bg-purple-50/60 border border-purple-200 text-center shrink-0">
-          <p className="text-xs text-subtext font-semibold">Total Progress</p>
-          <p className="text-3xl font-extrabold text-roadmap mt-0.5">53%</p>
-          <span className="text-[10px] text-purple-800 font-medium">Phase 3 in progress</span>
-        </div>
-      </div>
-
-      {/* Phased Roadmap Timeline */}
-      <div className="space-y-6">
-        {phases.map((item, idx) => {
-          const isCompleted = item.status === 'Completed';
-          const isInProgress = item.status === 'In Progress';
-
+      <div className="relative">
+        {learningRoadmap.map((phase, i) => {
+          const config = statusConfig[phase.status];
+          const StatusIcon = config.icon;
           return (
-            <div
-              key={idx}
-              className={`bg-surface rounded-2xl border p-6 shadow-subtle transition-all ${
-                isInProgress
-                  ? 'border-roadmap shadow-card ring-2 ring-roadmap/10'
-                  : isCompleted
-                  ? 'border-emerald-200 bg-emerald-50/20'
-                  : 'border-border'
-              }`}
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/80 pb-4">
-                <div className="flex items-center gap-3">
-                  <span className={`w-8 h-8 rounded-xl font-bold text-xs flex items-center justify-center ${
-                    isCompleted
-                      ? 'bg-emerald-100 text-secondary'
-                      : isInProgress
-                      ? 'bg-roadmap text-white'
-                      : 'bg-slate-100 text-slate-500'
-                  }`}>
-                    {isCompleted ? <CheckCircle2 className="w-5 h-5" /> : `P${item.phase}`}
-                  </span>
+            <div key={phase.phase} className="relative flex gap-4 pb-6 last:pb-0">
+              {i < learningRoadmap.length - 1 && (
+                <div className="absolute left-5 top-12 bottom-0 w-px bg-border" />
+              )}
+              <div className={`w-10 h-10 rounded-full ${config.bg} flex items-center justify-center shrink-0 z-10`}>
+                <StatusIcon className={`w-5 h-5 ${config.color}`} />
+              </div>
+              <Card className="p-5 flex-1">
+                <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h3 className="text-base font-bold text-main">{item.title}</h3>
-                    <p className="text-xs text-subtext flex items-center gap-3 mt-0.5">
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5" /> {item.duration}
-                      </span>
-                      <span>&bull;</span>
-                      <span>Difficulty: <strong>{item.difficulty}</strong></span>
-                    </p>
+                    <p className="text-xs font-semibold text-violet">Phase {phase.phase}</p>
+                    <h3 className="font-semibold text-main mt-0.5">{phase.title}</h3>
+                  </div>
+                  <Badge variant={config.badge}>{phase.status}</Badge>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-3 text-xs text-text-secondary">
+                  <span>Duration: {phase.duration}</span>
+                  <span>·</span>
+                  <span>Difficulty: {phase.difficulty}</span>
+                </div>
+                {phase.status !== 'Upcoming' && (
+                  <div className="mt-3">
+                    <div className="flex items-center justify-between text-xs mb-1">
+                      <span className="text-text-secondary">Progress</span>
+                      <span className="font-medium text-main">{phase.progress}%</span>
+                    </div>
+                    <Progress value={phase.progress} color={phase.status === 'Completed' ? 'success' : 'violet'} />
+                  </div>
+                )}
+                <div className="mt-4">
+                  <p className="text-xs font-medium text-main mb-1.5">Skills Gained</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {phase.skillsGained.map(s => <Badge key={s} variant="violet">{s}</Badge>)}
                   </div>
                 </div>
-
-                <div className="flex items-center gap-2">
-                  <Badge variant={isCompleted ? 'success' : isInProgress ? 'roadmap' : 'default'}>
-                    {item.status}
-                  </Badge>
+                <div className="mt-3">
+                  <p className="text-xs font-medium text-main mb-1.5 flex items-center gap-1"><BookOpen className="w-3 h-3" />Recommended Resources</p>
+                  <ul className="space-y-1">
+                    {phase.resources.map(r => <li key={r} className="text-xs text-text-secondary">· {r}</li>)}
+                  </ul>
                 </div>
-              </div>
-
-              {/* Skills gained in this phase */}
-              <div className="pt-4 space-y-3">
-                <div>
-                  <span className="text-xs font-semibold text-subtext">Competencies Acquired / Target:</span>
-                  <div className="flex flex-wrap gap-1.5 mt-1.5">
-                    {item.skillsGained.map((sk) => (
-                      <span
-                        key={sk}
-                        className={`px-2 py-0.5 rounded text-[11px] font-medium border ${
-                          isCompleted
-                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                            : isInProgress
-                            ? 'bg-purple-50 text-purple-800 border-purple-200'
-                            : 'bg-slate-100 text-slate-600 border-slate-200'
-                        }`}
-                      >
-                        {sk}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Resources */}
-                <div>
-                  <span className="text-xs font-semibold text-subtext">Curated Open Learning Resources:</span>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1.5">
-                    {item.resources.map((res, rIdx) => (
-                      <div key={rIdx} className="p-2.5 rounded-xl bg-slate-50 border border-border flex items-center justify-between text-xs">
-                        <div>
-                          <p className="font-semibold text-main">{res.title}</p>
-                          <span className="text-[10px] text-primary font-medium">{res.type}</span>
-                        </div>
-                        <span className="text-[10px] font-bold text-secondary bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
-                          FREE
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              </Card>
             </div>
           );
         })}
       </div>
     </div>
   );
-};
+}

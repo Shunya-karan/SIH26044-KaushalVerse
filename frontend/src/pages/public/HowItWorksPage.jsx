@@ -1,110 +1,106 @@
-import React from 'react';
-import { PageHeader } from '../../components/common/PageHeader';
-import { Button } from '../../components/ui';
 import { Link } from 'react-router-dom';
-import { GraduationCap, Building2, School, CheckCircle2, Target, Compass, Briefcase, BarChart } from 'lucide-react';
+import {
+  GraduationCap, Code2, GitCompare, Route, Briefcase, FileCheck2,
+  BarChart3, ArrowRight, CheckCircle2, Network, Users, Building2,
+} from 'lucide-react';
+import { Badge, Card, Button } from '@/components/ui';
 
-export const HowItWorksPage = () => {
+export default function HowItWorksPage() {
+  const studentSteps = [
+    { icon: GraduationCap, title: 'Create Your Profile', desc: 'Sign up as a student, add your education details, college, branch and personal information.' },
+    { icon: Code2, title: 'Map Your Skills', desc: 'Add your technical, soft and tool-based skills with proficiency levels. Track verification status for each skill.' },
+    { icon: GitCompare, title: 'Analyze Skill Gaps', desc: 'Select a target career role and see exactly which skills you have and which you need to develop.' },
+    { icon: Route, title: 'Follow Learning Roadmap', desc: 'Get a personalized phase-by-phase learning path with recommended resources and estimated duration.' },
+    { icon: Briefcase, title: 'Discover Opportunities', desc: 'Browse internships, jobs and projects matched to your skills with transparent match scores.' },
+    { icon: CheckCircle2, title: 'Apply & Get Placed', desc: 'Track your applications through every stage — from applied to selected.' },
+  ];
+
+  const companySteps = [
+    { title: 'Create Company Profile', desc: 'Set up your company with industry, location, size and contact details.' },
+    { title: 'Post Opportunities', desc: 'Create internship, job or project listings with required skills and eligibility criteria.' },
+    { title: 'Smart Candidate Matching', desc: 'View ranked candidates with transparent match scores and skill-by-skill breakdowns.' },
+    { title: 'Manage Applications', desc: 'Shortlist, reject and schedule interviews through a visual hiring pipeline.' },
+  ];
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
-      <PageHeader
-        title="How KaushalVerse Works"
-        subtitle="A tri-party collaborative digital framework aligning college students, academic institutions, and industry hiring partners."
-        breadcrumbs={[{ label: 'Home', link: '/' }, { label: 'How It Works' }]}
-      />
+    <div>
+      <section className="bg-white border-b border-border py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+          <Badge variant="primary" className="mb-3">How It Works</Badge>
+          <h1 className="text-4xl font-bold text-main">A clear path from skills to success</h1>
+          <p className="mt-4 max-w-2xl mx-auto text-text-secondary">KaushalVerse provides a structured, transparent workflow for students, companies and institutions to collaborate effectively.</p>
+        </div>
+      </section>
 
-      {/* For Students */}
-      <div className="bg-surface rounded-2xl border border-border p-8 space-y-6">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary-soft text-primary flex items-center justify-center">
-            <GraduationCap className="w-5 h-5" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold text-main">1. For Students & Job Aspirants</h2>
-            <p className="text-xs text-subtext">From classroom fundamentals to verified employability</p>
+      <section className="py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl font-bold text-main mb-2">For Students</h2>
+          <p className="text-text-secondary mb-10">Six steps from profile creation to placement.</p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {studentSteps.map((step, i) => (
+              <Card key={i} className="p-6 relative">
+                <div className="absolute top-5 right-5 text-5xl font-bold text-slate-100">{i + 1}</div>
+                <div className="w-12 h-12 rounded-xl bg-primary-soft text-primary flex items-center justify-center">
+                  <step.icon className="w-6 h-6" />
+                </div>
+                <h3 className="mt-4 font-semibold text-main">{step.title}</h3>
+                <p className="mt-2 text-sm text-text-secondary leading-relaxed">{step.desc}</p>
+              </Card>
+            ))}
           </div>
         </div>
+      </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
-          <div className="p-4 rounded-xl bg-slate-50 border border-border space-y-2">
-            <span className="text-xs font-bold text-primary uppercase">Step 1: Skill Mapping</span>
-            <p className="text-sm font-semibold text-main">Create Your Skill Profile</p>
-            <p className="text-xs text-subtext">Add frameworks, languages, and tools with verified academic transcripts and project evidence.</p>
-          </div>
-          <div className="p-4 rounded-xl bg-slate-50 border border-border space-y-2">
-            <span className="text-xs font-bold text-secondary uppercase">Step 2: Gap Analysis</span>
-            <p className="text-sm font-semibold text-main">Target Any Career Role</p>
-            <p className="text-xs text-subtext">Select Full Stack, AI/ML, Cloud or HealthTech to discover exact missing competencies with mathematical score breakdowns.</p>
-          </div>
-          <div className="p-4 rounded-xl bg-slate-50 border border-border space-y-2">
-            <span className="text-xs font-bold text-accent uppercase">Step 3: Discover & Apply</span>
-            <p className="text-sm font-semibold text-main">Apply with 1-Click Match</p>
-            <p className="text-xs text-subtext">Discover internships with real-time match badges. Submit verified credentials and track review timelines transparently.</p>
+      <section className="py-16 bg-white border-y border-border">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl font-bold text-main mb-2">For Companies</h2>
+          <p className="text-text-secondary mb-10">Hire smarter with transparent candidate matching.</p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {companySteps.map((step, i) => (
+              <Card key={i} className="p-6">
+                <div className="w-10 h-10 rounded-lg bg-accent-light text-accent flex items-center justify-center text-sm font-bold">{i + 1}</div>
+                <h3 className="mt-4 font-semibold text-main">{step.title}</h3>
+                <p className="mt-2 text-sm text-text-secondary leading-relaxed">{step.desc}</p>
+              </Card>
+            ))}
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* For Industry */}
-      <div className="bg-surface rounded-2xl border border-border p-8 space-y-6">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-amber-50 text-accent flex items-center justify-center">
-            <Building2 className="w-5 h-5" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold text-main">2. For Industry & Corporate Recruiters</h2>
-            <p className="text-xs text-subtext">Zero noise, verified talent shortlisting with explainable compatibility</p>
+      <section id="features" className="py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl font-bold text-main mb-10">Key Features</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[
+              { icon: Code2, title: 'Skill Mapping', desc: 'Add and manage skills across categories with proficiency levels.' },
+              { icon: GitCompare, title: 'Skill Gap Analysis', desc: 'Compare your skills against target roles with explainable match scores.' },
+              { icon: Briefcase, title: 'Opportunity Discovery', desc: 'Browse and filter internships, jobs and projects by match score.' },
+              { icon: Route, title: 'Learning Roadmaps', desc: 'Phase-by-phase learning paths with resources and progress tracking.' },
+              { icon: FileCheck2, title: 'Resume Intelligence', desc: 'ATS readiness scoring and keyword gap recommendations.' },
+              { icon: BarChart3, title: 'Placement Analytics', desc: 'Industry trends, skill demand and placement dashboards.' },
+            ].map((f, i) => (
+              <Card key={i} className="p-6">
+                <div className="w-11 h-11 rounded-xl bg-primary-soft text-primary flex items-center justify-center">
+                  <f.icon className="w-5 h-5" />
+                </div>
+                <h3 className="mt-4 font-semibold text-main">{f.title}</h3>
+                <p className="mt-2 text-sm text-text-secondary">{f.desc}</p>
+              </Card>
+            ))}
           </div>
         </div>
+      </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
-          <div className="p-4 rounded-xl bg-slate-50 border border-border space-y-2">
-            <span className="text-xs font-bold text-accent uppercase">Step 1: Post Requirements</span>
-            <p className="text-sm font-semibold text-main">Specify Mandatory vs Preferred Skills</p>
-            <p className="text-xs text-subtext">Define concrete role criteria, stipend, duration, and academic eligibility requirements.</p>
-          </div>
-          <div className="p-4 rounded-xl bg-slate-50 border border-border space-y-2">
-            <span className="text-xs font-bold text-primary uppercase">Step 2: Smart Matching</span>
-            <p className="text-sm font-semibold text-main">Ranked Candidate Feed</p>
-            <p className="text-xs text-subtext">Inspect pre-scored candidate profiles (94%, 88%, etc.) with transparent reasons why each candidate qualifies.</p>
-          </div>
-          <div className="p-4 rounded-xl bg-slate-50 border border-border space-y-2">
-            <span className="text-xs font-bold text-secondary uppercase">Step 3: Seamless Shortlisting</span>
-            <p className="text-sm font-semibold text-main">Interview & Placement</p>
-            <p className="text-xs text-subtext">Shortlist candidates, trigger technical evaluations, and issue pre-placement offers (PPOs) effortlessly.</p>
+      <section className="py-16 bg-white border-t border-border text-center">
+        <div className="mx-auto max-w-3xl px-4">
+          <h2 className="text-3xl font-bold text-main">Ready to get started?</h2>
+          <p className="mt-4 text-text-secondary">Create your account and start your journey with KaushalVerse.</p>
+          <div className="mt-8 flex justify-center gap-3">
+            <Link to="/register"><Button size="lg">Get Started <ArrowRight className="w-4 h-4" /></Button></Link>
+            <Link to="/login"><Button variant="secondary" size="lg">Login</Button></Link>
           </div>
         </div>
-      </div>
-
-      {/* For Institutions */}
-      <div className="bg-surface rounded-2xl border border-border p-8 space-y-6">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-purple-50 text-roadmap flex items-center justify-center">
-            <School className="w-5 h-5" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold text-main">3. For Colleges, Deans & Placement Cells</h2>
-            <p className="text-xs text-subtext">Macro insights, NIRF/NAAC accreditation readiness, and curriculum alignment</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
-          <div className="p-4 rounded-xl bg-slate-50 border border-border space-y-2">
-            <span className="text-xs font-bold text-roadmap uppercase">Analytics 1: Macro Trends</span>
-            <p className="text-sm font-semibold text-main">Curriculum Supply vs Demand</p>
-            <p className="text-xs text-subtext">Identify emerging industry requirements (e.g., Docker, ABDM standards) missing from standard departmental syllabi.</p>
-          </div>
-          <div className="p-4 rounded-xl bg-slate-50 border border-border space-y-2">
-            <span className="text-xs font-bold text-primary uppercase">Analytics 2: Placement Tracking</span>
-            <p className="text-sm font-semibold text-main">Branch-wise Outcomes</p>
-            <p className="text-xs text-subtext">Monitor real-time placement percentages, average CTCs, and top hiring sectors across all academic branches.</p>
-          </div>
-          <div className="p-4 rounded-xl bg-slate-50 border border-border space-y-2">
-            <span className="text-xs font-bold text-secondary uppercase">Analytics 3: Accreditation Reports</span>
-            <p className="text-sm font-semibold text-main">Automated Compliance Exports</p>
-            <p className="text-xs text-subtext">Export structured student skill progression records for AICTE, NIRF, and NAAC institutional evaluations.</p>
-          </div>
-        </div>
-      </div>
+      </section>
     </div>
   );
-};
+}

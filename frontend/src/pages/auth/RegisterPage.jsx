@@ -1,154 +1,162 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Logo } from '../../components/common/Logo';
-import { Button } from '../../components/ui';
-import { useAuth } from '../../context/AuthContext';
-import { UserCheck, Building2, School, ArrowRight } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { toast } from 'sonner';
+import { Eye, EyeOff, GraduationCap, Building2, Shield, Check } from 'lucide-react';
+import Logo from '@/components/common/Logo';
+import { useAuth } from '@/context/AuthContext';
 
-export const RegisterPage = () => {
-  const { loginAs } = useAuth();
-  const navigate = useNavigate();
+const schema = z.object({
+  fullName: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Enter a valid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+  confirmPassword: z.string(),
+  accountType: z.enum(['student', 'company', 'institution']),
+}).refine(data => data.password === data.confirmPassword, {
+  message: 'Passwords do not match',
+  path: ['confirmPassword'],
+});
+
+export default function RegisterPage() {
+  const [showPassword, setShowPassword] = useState(false);
   const [accountType, setAccountType] = useState('student');
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [collegeOrCompany, setCollegeOrCompany] = useState('');
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: { accountType: 'student' },
+  });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    loginAs(accountType);
-    toast.success(`Account created successfully for ${fullName || 'Demo User'}!`);
-    if (accountType === 'student') navigate('/student/dashboard');
-    else if (accountType === 'company') navigate('/company/dashboard');
-    else navigate('/admin/dashboard');
+  const onSubmit = (data) => {
+    login(accountType, data.email);
+    toast.success('Account created successfully!');
+    navigate(`/${accountType === 'institution' ? 'admin' : accountType}`);
   };
 
-  return (
-    <div className="min-h-[85vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-lg w-full space-y-6">
-        <div className="text-center space-y-2">
-          <Logo size="large" className="justify-center" />
-          <h2 className="text-2xl font-extrabold text-main mt-3">Create Your Account</h2>
-          <p className="text-xs text-subtext">Join the national Academia–Industry skill collaboration network</p>
-        </div>
+  const accountTypes = [
+    { value: 'student', label: 'Student', desc: 'Find opportunities & track skills', icon: GraduationCap },
+    { value: 'company', label: 'Company', desc: 'Post jobs & find candidates', icon: Building2 },
+    { value: 'institution', label: 'Institution', desc: 'Manage students & analytics', icon: Shield },
+  ];
 
-        <div className="bg-surface rounded-2xl border border-border p-6 sm:p-8 shadow-card space-y-5">
-          {/* Role selector */}
-          <div>
-            <label className="block text-xs font-semibold text-main mb-2">Select Your Role</label>
-            <div className="grid grid-cols-3 gap-2 text-xs">
-              <button
-                type="button"
-                onClick={() => setAccountType('student')}
-                className={`p-3 rounded-xl border text-center font-semibold transition-all ${
-                  accountType === 'student'
-                    ? 'border-primary bg-primary-soft text-primary shadow-xs'
-                    : 'border-border text-subtext hover:bg-slate-50'
-                }`}
-              >
-                <UserCheck className="w-5 h-5 mx-auto mb-1" />
-                Student
-              </button>
-              <button
-                type="button"
-                onClick={() => setAccountType('company')}
-                className={`p-3 rounded-xl border text-center font-semibold transition-all ${
-                  accountType === 'company'
-                    ? 'border-accent bg-orange-50 text-accent shadow-xs'
-                    : 'border-border text-subtext hover:bg-slate-50'
-                }`}
-              >
-                <Building2 className="w-5 h-5 mx-auto mb-1" />
-                Company
-              </button>
-              <button
-                type="button"
-                onClick={() => setAccountType('admin')}
-                className={`p-3 rounded-xl border text-center font-semibold transition-all ${
-                  accountType === 'admin'
-                    ? 'border-purple-600 bg-purple-50 text-purple-700 shadow-xs'
-                    : 'border-border text-subtext hover:bg-slate-50'
-                }`}
-              >
-                <School className="w-5 h-5 mx-auto mb-1" />
-                Institution
-              </button>
+  return (
+    <div className="min-h-screen flex flex-col lg:flex-row">
+      <div className="hidden lg:flex lg:w-1/2 bg-primary p-12 flex-col justify-between relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-20 right-20 w-72 h-72 rounded-full border-8 border-white" />
+          <div className="absolute bottom-20 left-20 w-80 h-80 rounded-full border-8 border-white" />
+        </div>
+        <div className="relative">
+          <Link to="/" className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-lg bg-white flex items-center justify-center">
+              <svg className="w-5 h-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}><circle cx="12" cy="12" r="2" /><circle cx="4" cy="6" r="2" /><circle cx="20" cy="6" r="2" /><circle cx="4" cy="18" r="2" /><circle cx="20" cy="18" r="2" /><path d="M4 6l8 6 8-6M4 18l8-6 8 6" /></svg>
             </div>
+            <span className="text-xl font-bold text-white">KaushalVerse</span>
+          </Link>
+        </div>
+        <div className="relative">
+          <h2 className="text-3xl font-bold text-white leading-tight">Start your career journey today</h2>
+          <p className="mt-4 text-teal-100 leading-relaxed">Create your KaushalVerse account and get access to skill mapping, personalized roadmaps, and thousands of opportunities.</p>
+          <div className="mt-8 space-y-3">
+            {['Free for students and institutions', 'AI-powered skill gap analysis', 'Transparent match scoring', 'Industry-standard resume analysis'].map((item, i) => (
+              <div key={i} className="flex items-center gap-3 text-white">
+                <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                  <Check className="w-3.5 h-3.5" />
+                </div>
+                <span className="text-sm">{item}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <p className="relative text-xs text-teal-200">© 2025 KaushalVerse — SIH Hackathon Prototype</p>
+      </div>
+
+      <div className="flex-1 flex items-center justify-center p-6 sm:p-12 bg-bg overflow-y-auto">
+        <div className="w-full max-w-md my-8">
+          <div className="lg:hidden mb-8">
+            <Logo size="md" to="/" />
+          </div>
+          <h1 className="text-2xl font-bold text-main">Create your account</h1>
+          <p className="mt-2 text-sm text-text-secondary">Join KaushalVerse and bridge the skill gap.</p>
+
+          <div className="mt-6">
+            <label className="label">Account Type</label>
+            <div className="grid grid-cols-3 gap-2">
+              {accountTypes.map(type => (
+                <button
+                  key={type.value}
+                  type="button"
+                  onClick={() => setAccountType(type.value)}
+                  className={`flex flex-col items-center gap-2 rounded-lg border p-3 transition-all ${
+                    accountType === type.value ? 'border-primary bg-primary-soft' : 'border-border bg-white hover:bg-bg'
+                  }`}
+                >
+                  <type.icon className={`w-5 h-5 ${accountType === type.value ? 'text-primary' : 'text-text-secondary'}`} />
+                  <span className="text-xs font-medium text-main">{type.label}</span>
+                </button>
+              ))}
+            </div>
+            <p className="mt-2 text-xs text-text-secondary">{accountTypes.find(t => t.value === accountType)?.desc}</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+          <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4">
+            <input type="hidden" {...register('accountType')} value={accountType} />
             <div>
-              <label className="block font-semibold text-main mb-1">Full Name</label>
+              <label className="label">Full Name</label>
               <input
-                required
-                type="text"
-                placeholder="e.g. Aarav Sharma"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                className="w-full p-2.5 rounded-lg border border-border bg-slate-50 focus:bg-white focus:border-primary outline-none"
+                {...register('fullName')}
+                placeholder="Enter your full name"
+                className={`input ${errors.fullName ? 'border-error' : ''}`}
               />
+              {errors.fullName && <p className="mt-1 text-xs text-error">{errors.fullName.message}</p>}
             </div>
-
             <div>
-              <label className="block font-semibold text-main mb-1">Official / Institutional Email</label>
+              <label className="label">Email</label>
               <input
-                required
                 type="email"
-                placeholder="aarav@ves.ac.in"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full p-2.5 rounded-lg border border-border bg-slate-50 focus:bg-white focus:border-primary outline-none"
+                {...register('email')}
+                placeholder="you@example.com"
+                className={`input ${errors.email ? 'border-error' : ''}`}
               />
+              {errors.email && <p className="mt-1 text-xs text-error">{errors.email.message}</p>}
             </div>
-
             <div>
-              <label className="block font-semibold text-main mb-1">
-                {accountType === 'student' ? 'College / University' : accountType === 'company' ? 'Company Name' : 'Academic Institution'}
-              </label>
+              <label className="label">Password</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  {...register('password')}
+                  placeholder="Create a password"
+                  className={`input pr-10 ${errors.password ? 'border-error' : ''}`}
+                />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-main">
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              {errors.password && <p className="mt-1 text-xs text-error">{errors.password.message}</p>}
+            </div>
+            <div>
+              <label className="label">Confirm Password</label>
               <input
-                required
-                type="text"
-                placeholder={accountType === 'student' ? "Vivekanand Education Society's College" : "e.g. Razorpay India"}
-                value={collegeOrCompany}
-                onChange={(e) => setCollegeOrCompany(e.target.value)}
-                className="w-full p-2.5 rounded-lg border border-border bg-slate-50 focus:bg-white focus:border-primary outline-none"
+                type={showPassword ? 'text' : 'password'}
+                {...register('confirmPassword')}
+                placeholder="Re-enter your password"
+                className={`input ${errors.confirmPassword ? 'border-error' : ''}`}
               />
+              {errors.confirmPassword && <p className="mt-1 text-xs text-error">{errors.confirmPassword.message}</p>}
             </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block font-semibold text-main mb-1">Password</label>
-                <input
-                  required
-                  type="password"
-                  placeholder="••••••••"
-                  className="w-full p-2.5 rounded-lg border border-border bg-slate-50 focus:bg-white focus:border-primary outline-none"
-                />
-              </div>
-              <div>
-                <label className="block font-semibold text-main mb-1">Confirm Password</label>
-                <input
-                  required
-                  type="password"
-                  placeholder="••••••••"
-                  className="w-full p-2.5 rounded-lg border border-border bg-slate-50 focus:bg-white focus:border-primary outline-none"
-                />
-              </div>
-            </div>
-
-            <Button type="submit" variant="primary" size="md" className="w-full" icon={ArrowRight} iconPosition="right">
-              Complete Registration (Demo)
-            </Button>
+            <button type="submit" disabled={isSubmitting} className="btn-primary w-full">
+              {isSubmitting ? 'Creating account...' : 'Create Account'}
+            </button>
           </form>
 
-          <div className="pt-3 border-t border-border text-center text-xs text-subtext">
-            Already registered?{' '}
-            <Link to="/login" className="font-semibold text-primary hover:underline">
-              Sign in
-            </Link>
-          </div>
+          <p className="mt-6 text-center text-sm text-text-secondary">
+            Already have an account? <Link to="/login" className="font-semibold text-primary hover:underline">Sign in</Link>
+          </p>
         </div>
       </div>
     </div>
   );
-};
+}

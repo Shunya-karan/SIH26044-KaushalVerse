@@ -1,39 +1,40 @@
-import React from 'react';
-import { PageHeader } from '../../components/common/PageHeader';
-import { StatCard } from '../../components/common/StatCard';
-import { mockAnalytics } from '../../data/mockAnalytics';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { BarChart3, Users, Clock, Award } from 'lucide-react';
+import { BarChart3, TrendingUp, Briefcase, Users } from 'lucide-react';
+import { PageHeader } from '@/components/common/Shared';
+import { StatCard } from '@/components/dashboard';
+import { Card } from '@/components/ui';
+import { GrowthLineChart, SimpleBarChart, DemandPieChart } from '@/components/charts';
+import { studentGrowthData, industryDistribution, topHiringSkills, skillDemandData } from '@/data/mockAnalytics';
 
-export const CompanyAnalytics = () => {
+export default function CompanyAnalytics() {
   return (
-    <div className="space-y-8">
-      <PageHeader
-        title="Hiring Pipeline & Campus Analytics"
-        subtitle="Measure campus hiring velocity, qualification rates, and university applicant distribution."
-        breadcrumbs={[{ label: 'Dashboard', link: '/company/dashboard' }, { label: 'Analytics' }]}
-      />
+    <div className="space-y-6">
+      <PageHeader title="Analytics" subtitle="Hiring insights and application trends" icon={BarChart3} />
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatCard title="Average Time to Offer" value="14 Days" subtitle="Down from 38 days manual" color="secondary" />
-        <StatCard title="Candidate Quality Index" value="92%" subtitle="Verified skill benchmark" color="primary" />
-        <StatCard title="Offer Acceptance Rate" value="88%" subtitle="High intent campus candidates" color="accent" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard label="Total Views" value={1240} icon={Users} color="primary" trend="+18%" />
+        <StatCard label="Applications" value={340} icon={Briefcase} color="info" trend="+45" />
+        <StatCard label="Shortlisted" value={28} icon={TrendingUp} color="secondary" trend="+8" />
+        <StatCard label="Hired" value={5} icon={Briefcase} color="accent" trend="+2" />
       </div>
 
-      <div className="bg-surface rounded-2xl border border-border p-6 shadow-subtle space-y-4">
-        <h3 className="text-sm font-bold text-main">Applicant Volume by Engineering Branch</h3>
-        <div className="h-64 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={mockAnalytics.branchPlacementRates}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis dataKey="branch" tick={{ fontSize: 11, fill: '#64748b' }} />
-              <YAxis tick={{ fontSize: 11, fill: '#64748b' }} />
-              <Tooltip />
-              <Bar dataKey="placedRate" fill="#0F766E" radius={[4, 4, 0, 0]} name="Skill Qualification %" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+      <div className="grid lg:grid-cols-2 gap-6">
+        <Card className="p-6">
+          <h3 className="font-semibold text-main mb-4">Application Trends</h3>
+          <GrowthLineChart data={studentGrowthData.slice(-6)} keys={[{ key: 'students', color: '#0F766E', label: 'Applications' }]} height={280} />
+        </Card>
+        <Card className="p-6">
+          <h3 className="font-semibold text-main mb-4">Top Skills in Applicants</h3>
+          <SimpleBarChart data={topHiringSkills} xKey="skill" bars={[{ key: 'hires', color: '#0F766E', label: 'Applicants' }]} height={280} />
+        </Card>
+        <Card className="p-6">
+          <h3 className="font-semibold text-main mb-4">Industry Distribution</h3>
+          <DemandPieChart data={industryDistribution} height={280} />
+        </Card>
+        <Card className="p-6">
+          <h3 className="font-semibold text-main mb-4">Skill Demand Overview</h3>
+          <SimpleBarChart data={skillDemandData.slice(0, 6)} xKey="skill" bars={[{ key: 'demand', color: '#F97316', label: 'Demand' }]} height={280} />
+        </Card>
       </div>
     </div>
   );
-};
+}

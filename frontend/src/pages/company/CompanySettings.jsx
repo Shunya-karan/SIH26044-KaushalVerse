@@ -1,27 +1,43 @@
-import React from 'react';
-import { PageHeader } from '../../components/common/PageHeader';
-import { Button } from '../../components/ui';
-import { toast } from 'sonner';
+import { Settings as SettingsIcon, Building2, Bell, Shield } from 'lucide-react';
+import { PageHeader } from '@/components/common/Shared';
+import { Card, Button, Input } from '@/components/ui';
 
-export const CompanySettings = () => {
+export default function CompanySettings() {
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <PageHeader
-        title="Company Settings"
-        subtitle="Manage recruitment team permissions, candidate notifications, and interview integrations."
-        breadcrumbs={[{ label: 'Dashboard', link: '/company/dashboard' }, { label: 'Settings' }]}
-      />
+    <div className="space-y-6">
+      <PageHeader title="Settings" subtitle="Manage your company account preferences" icon={SettingsIcon} />
 
-      <div className="bg-surface rounded-2xl border border-border p-6 shadow-subtle space-y-4 text-xs">
-        <h3 className="text-sm font-bold text-main border-b border-border pb-3">Automated Candidate Match Threshold</h3>
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="font-semibold text-main">Highlight Candidates with ≥ 80% Skill Match</p>
-            <p className="text-subtext">Sends daily digest of high-compatibility applicants.</p>
-          </div>
-          <input type="checkbox" defaultChecked className="h-4 w-4 text-primary rounded" />
+      <Card className="p-6">
+        <h3 className="font-semibold text-main mb-4 flex items-center gap-2"><Building2 className="w-4 h-4 text-primary" />Company Information</h3>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <Input label="Company Name" defaultValue="TechVista Solutions" />
+          <Input label="Industry" defaultValue="IT Services" />
+          <Input label="Contact Email" defaultValue="careers@techvista.example.com" />
+          <Input label="Contact Phone" defaultValue="+91 80 2345 6789" />
         </div>
-      </div>
+        <div className="mt-4 flex justify-end"><Button>Save Changes</Button></div>
+      </Card>
+
+      <Card className="p-6">
+        <h3 className="font-semibold text-main mb-4 flex items-center gap-2"><Bell className="w-4 h-4 text-primary" />Notification Settings</h3>
+        <div className="space-y-3">
+          {['Email notifications for new applications', 'Daily application summary', 'Candidate match alerts', 'Weekly hiring analytics report'].map(item => (
+            <label key={item} className="flex items-center justify-between py-2">
+              <span className="text-sm text-main">{item}</span>
+              <input type="checkbox" defaultChecked className="rounded border-border text-primary focus:ring-primary/20" />
+            </label>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="p-6">
+        <h3 className="font-semibold text-main mb-4 flex items-center gap-2"><Shield className="w-4 h-4 text-primary" />Security</h3>
+        <div className="flex flex-wrap gap-3">
+          <Button variant="secondary">Change Password</Button>
+          <Button variant="secondary">Two-Factor Authentication</Button>
+          <Button variant="secondary" className="text-error border-error/30 hover:bg-red-50">Delete Account</Button>
+        </div>
+      </Card>
     </div>
   );
-};
+}
