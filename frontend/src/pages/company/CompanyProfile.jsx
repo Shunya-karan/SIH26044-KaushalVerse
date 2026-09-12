@@ -1,71 +1,94 @@
-import { Building2, Globe, MapPin, Mail, Phone, Edit3 } from 'lucide-react';
-import { PageHeader } from '@/components/common/Shared';
-import { Card, Badge, Button, Avatar, Progress, Input } from '@/components/ui';
-import { mockCompanies } from '@/data/mockCompanies';
+import React, { useState } from "react";
+import { toast } from "sonner";
+import { Pencil, Check } from "lucide-react";
+import { PageHeader } from "@/components/common/States";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Progress } from "@/components/ui/progress";
+import { CURRENT_COMPANY } from "@/data/mockCompanies";
+import { initials } from "@/lib/utils";
 
 export default function CompanyProfile() {
-  const company = mockCompanies[0];
+  const [editing, setEditing] = useState(false);
+  const [profile, setProfile] = useState(CURRENT_COMPANY);
+  const [draft, setDraft] = useState(CURRENT_COMPANY);
+
+  const handleSave = () => {
+    setProfile(draft);
+    setEditing(false);
+    toast.success("Company profile updated");
+  };
+
+  const field = (key, label, type = "text") => (
+    <div className="space-y-1.5">
+      <Label>{label}</Label>
+      {editing ? (
+        type === "textarea" ? (
+          <Textarea value={draft[key]} onChange={(e) => setDraft({ ...draft, [key]: e.target.value })} rows={4} />
+        ) : (
+          <Input value={draft[key]} onChange={(e) => setDraft({ ...draft, [key]: e.target.value })} />
+        )
+      ) : (
+        <p className="text-sm text-foreground">{profile[key]}</p>
+      )}
+    </div>
+  );
 
   return (
-    <div className="space-y-6">
-      <PageHeader title="Company Profile" subtitle="Manage your company information and branding" icon={Building2} />
-
-      <Card className="p-6">
-        <div className="flex flex-col sm:flex-row items-start gap-5">
-          <Avatar name={company.name} size="xl" />
-          <div className="flex-1">
-            <h2 className="text-xl font-bold text-main">{company.name}</h2>
-            <p className="text-sm text-text-secondary mt-0.5">{company.industry} · {company.size} employees</p>
-            <div className="mt-3 flex flex-wrap gap-4 text-sm text-text-secondary">
-              <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4" />{company.location}</span>
-              <span className="flex items-center gap-1.5"><Globe className="w-4 h-4" />{company.website}</span>
-              <span className="flex items-center gap-1.5"><Mail className="w-4 h-4" />{company.contactEmail}</span>
-            </div>
-          </div>
-          <Button variant="secondary" size="sm"><Edit3 className="w-4 h-4" />Edit</Button>
+    <div>
+      <PageHeader
+        title="Company Profile"
+        description="Keep your company information up to date for candidates and admins."
+        action={
+          editing ? (
+            <Button onClick={handleSave}><Check className="h-4 w-4" /> Save Changes</Button>
+          ) : (
+            <Button variant="outline" onClick={() => { setDraft(profile); setEditing(true); }}><Pencil className="h-4 w-4" /> Edit Profile</Button>
+          )
+        }
+      />
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2 space-y-6">
+          <Card>
+            <CardHeader><CardTitle>Company Information</CardTitle></CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center gap-4">
+                <Avatar className="h-16 w-16 rounded-lg">
+                  <AvatarFallback className="rounded-lg text-lg">{initials(profile.name)}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="font-semibold text-foreground">{profile.name}</p>
+                  <p className="text-sm text-muted-foreground">{profile.industry}</p>
+                </div>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                {field("name", "Company Name")}
+                {field("industry", "Industry")}
+                {field("website", "Website")}
+                {field("location", "Location")}
+                {field("size", "Company Size")}
+                {field("contactEmail", "Contact Email")}
+              </div>
+              {field("about", "About", "textarea")}
+            </CardContent>
+          </Card>
         </div>
-        <div className="mt-5 pt-5 border-t border-border">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-main">Profile Completion</span>
-            <span className="text-sm font-semibold text-primary">{company.profileCompletion}%</span>
-          </div>
-          <Progress value={company.profileCompletion} color="primary" />
+        <div>
+          <Card>
+            <CardHeader><CardTitle>Profile Completion</CardTitle></CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-muted-foreground">Overall completion</span>
+                <span className="text-sm font-bold text-foreground">{profile.profileCompletion}%</span>
+              </div>
+              <Progress value={profile.profileCompletion} />
+            </CardContent>
+          </Card>
         </div>
-      </Card>
-
-      <div className="grid lg:grid-cols-2 gap-6">
-        <Card className="p-6">
-          <h3 className="font-semibold text-main mb-4">Company Information</h3>
-          <div className="space-y-4">
-            <Input label="Company Name" defaultValue={company.name} />
-            <Input label="Industry" defaultValue={company.industry} />
-            <Input label="Website" defaultValue={company.website} />
-            <Input label="Location" defaultValue={company.location} />
-            <div>
-              <label className="label">About</label>
-              <textarea className="input" rows={4} defaultValue={company.about} />
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-6">
-          <h3 className="font-semibold text-main mb-4">Contact Information</h3>
-          <div className="space-y-4">
-            <Input label="Contact Person" defaultValue={company.contactName} />
-            <Input label="Contact Email" defaultValue={company.contactEmail} />
-            <Input label="Contact Phone" defaultValue={company.contactPhone} />
-            <Input label="Company Size" defaultValue={company.size} />
-          </div>
-          <div className="mt-6 pt-6 border-t border-border">
-            <h4 className="text-sm font-semibold text-main mb-3">Company Stats</h4>
-            <div className="grid grid-cols-3 gap-3 text-center">
-              <div className="rounded-lg border border-border p-3"><p className="text-xl font-bold text-primary">{company.opportunities}</p><p className="text-xs text-text-secondary">Opportunities</p></div>
-              <div className="rounded-lg border border-border p-3"><p className="text-xl font-bold text-info">{company.applications}</p><p className="text-xs text-text-secondary">Applications</p></div>
-              <div className="rounded-lg border border-border p-3"><p className="text-xl font-bold text-success">5</p><p className="text-xs text-text-secondary">Placed</p></div>
-            </div>
-          </div>
-          <div className="mt-4 flex justify-end"><Button>Save Changes</Button></div>
-        </Card>
       </div>
     </div>
   );

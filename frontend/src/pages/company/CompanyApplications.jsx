@@ -1,68 +1,88 @@
-import { useState } from 'react';
-import { FileText, Eye, FileCheck2, Star, X } from 'lucide-react';
-import { PageHeader } from '@/components/common/Shared';
-import { Card, Badge, Tabs, Button, Avatar } from '@/components/ui';
-import { MatchScore } from '@/components/dashboard';
-import { mockApplications } from '@/data/mockApplications';
-
-const statusVariant = {
-  'Applied': 'warning', 'Under Review': 'info', 'Shortlisted': 'primary',
-  'Interview': 'violet', 'Selected': 'success', 'Rejected': 'error',
-};
+import React, { useState } from "react";
+import { toast } from "sonner";
+import { FileText, ThumbsUp, ThumbsDown, Eye } from "lucide-react";
+import { PageHeader, EmptyState } from "@/components/common/States";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
+import { StatusBadge } from "@/components/applications/ApplicationComponents";
+import { COMPANY_APPLICANTS } from "@/data/mockApplications";
+import { initials } from "@/lib/utils";
+import { MatchScore } from "@/components/dashboard/DashboardWidgets";
 
 export default function CompanyApplications() {
-  const [activeTab, setActiveTab] = useState('all');
-  const tabs = [
-    { id: 'all', label: 'All', count: mockApplications.length },
-    { id: 'shortlisted', label: 'Shortlisted', count: mockApplications.filter(a => a.status === 'Shortlisted').length },
-    { id: 'interview', label: 'Interview', count: mockApplications.filter(a => a.status === 'Interview').length },
-    { id: 'selected', label: 'Selected', count: mockApplications.filter(a => a.status === 'Selected').length },
-  ];
+  const [applicants, setApplicants] = useState(COMPANY_APPLICANTS);
+  const [viewing, setViewing] = useState(null);
 
-  let filtered = mockApplications;
-  if (activeTab === 'shortlisted') filtered = mockApplications.filter(a => a.status === 'Shortlisted');
-  if (activeTab === 'interview') filtered = mockApplications.filter(a => a.status === 'Interview');
-  if (activeTab === 'selected') filtered = mockApplications.filter(a => a.status === 'Selected');
+  const updateStatus = (id, status) => {
+    setApplicants(applicants.map((a) => (a.id === id ? { ...a, status } : a)));
+    toast.success(`Candidate ${status.toLowerCase()}`);
+  };
 
   return (
-    <div className="space-y-6">
-      <PageHeader title="Applications" subtitle="Review and manage candidate applications" icon={FileText} />
-      <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
+    <div>
+      <PageHeader title="Applications" description="Review and manage applicants across your opportunities." />
 
-      <div className="space-y-4">
-        {filtered.map(app => (
-          <Card key={app.id} className="p-5">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-              <div className="flex items-center gap-3 flex-1">
-                <Avatar name={app.studentName} size="md" />
+      {applicants.length === 0 ? (
+        <EmptyState title="No applicants yet" description="Applicants for your opportunities will appear here." />
+      ) : (
+        <div className="grid gap-4">
+          {applicants.map((a) => (
+            <Card key={a.id}>
+              <CardContent className="p-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-11 w-11"><AvatarFallback>{initials(a.name)}</AvatarFallback></Avatar>
+                  <div>
+                    <p className="font-semibold text-foreground">{a.name}</p>
+                    <p className="text-sm text-muted-foreground">{a.college} · {a.degree}</p>
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {a.skills.map((s) => <Badge key={s} variant="outline">{s}</Badge>)}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <MatchScore score={a.match} size="sm" />
+                  <StatusBadge status={a.status} />
+                  <div className="flex gap-1.5">
+                    <Button variant="outline" size="sm" onClick={() => setViewing(a)}><Eye className="h-4 w-4" /></Button>
+                    <Button variant="outline" size="sm" onClick={() => updateStatus(a.id, "Shortlisted")}><ThumbsUp className="h-4 w-4 text-success" /></Button>
+                    <Button variant="outline" size="sm" onClick={() => updateStatus(a.id, "Rejected")}><ThumbsDown className="h-4 w-4 text-error" /></Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      <Dialog open={!!viewing} onOpenChange={(v) => !v && setViewing(null)}>
+        <DialogContent>
+          {viewing && (
+            <>
+              <DialogHeader><DialogTitle>{viewing.name}</DialogTitle></DialogHeader>
+              <div className="space-y-3 text-sm">
+                <p><span className="text-muted-foreground">College:</span> {viewing.college}</p>
+                <p><span className="text-muted-foreground">Degree:</span> {viewing.degree}</p>
+                <p><span className="text-muted-foreground">Applied:</span> {viewing.appliedDate}</p>
+                <p><span className="text-muted-foreground">Match Score:</span> {viewing.match}%</p>
+                <p><span className="text-muted-foreground">Resume Score:</span> {viewing.resumeScore}/100</p>
+                <div className="flex items-center gap-2 rounded-lg border border-border p-3">
+                  <FileText className="h-4 w-4 text-primary" />
+                  <span className="text-sm text-foreground">resume_{viewing.name.toLowerCase().replace(" ", "_")}.pdf</span>
+                </div>
                 <div>
-                  <h3 className="font-semibold text-main">{app.studentName}</h3>
-                  <p className="text-sm text-text-secondary">{app.role} · {app.college}</p>
-                  <p className="text-xs text-text-muted">{app.degree}</p>
+                  <p className="text-muted-foreground mb-1.5">Skills</p>
+                  <div className="flex flex-wrap gap-1.5">{viewing.skills.map((s) => <Badge key={s} variant="outline">{s}</Badge>)}</div>
                 </div>
               </div>
-              <div className="flex flex-wrap items-center gap-3">
-                <MatchScore score={app.matchScore} size="sm" />
-                <div className="flex flex-wrap gap-1">
-                  {app.skills.slice(0, 3).map(s => <Badge key={s} variant="default">{s}</Badge>)}
-                </div>
-                <Badge variant={statusVariant[app.status]}>{app.status}</Badge>
-              </div>
-            </div>
-            <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
-              <span className="text-xs text-text-muted">Applied: {app.appliedDate} · Updated: {app.lastUpdated}</span>
-              <div className="flex gap-2">
-                <Button variant="ghost" size="sm"><Eye className="w-4 h-4" />Profile</Button>
-                <Button variant="ghost" size="sm"><FileCheck2 className="w-4 h-4" />Resume</Button>
-                <Button variant="secondary" size="sm" className="text-success border-success/30 hover:bg-green-50"><Star className="w-4 h-4" />Shortlist</Button>
-                <Button variant="secondary" size="sm" className="text-error border-error/30 hover:bg-red-50"><X className="w-4 h-4" />Reject</Button>
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
-
-      {filtered.length === 0 && <Card className="p-12 text-center"><p className="text-text-secondary">No applications in this category.</p></Card>}
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1,112 +1,124 @@
-import { Link } from 'react-router-dom';
-import { GraduationCap, MapPin, Mail, Award, Edit3, Briefcase, Code2 } from 'lucide-react';
-import { PageHeader } from '@/components/common/Shared';
-import { Card, Badge, Button, Avatar, Progress } from '@/components/ui';
-import { useAuth } from '@/context/AuthContext';
-import { mockStudents } from '@/data/mockStudents';
+import React, { useState } from "react";
+import { toast } from "sonner";
+import { Pencil, Check, User } from "lucide-react";
+import { PageHeader } from "@/components/common/States";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { CURRENT_STUDENT } from "@/data/mockStudents";
+import { STUDENT_SKILLS } from "@/data/mockSkills";
+import { initials } from "@/lib/utils";
 
 export default function StudentProfile() {
-  const { user } = useAuth();
-  const student = mockStudents.find(s => s.id === 's1') || mockStudents[0];
+  const [editing, setEditing] = useState(false);
+  const [profile, setProfile] = useState(CURRENT_STUDENT);
+  const [draft, setDraft] = useState(CURRENT_STUDENT);
+
+  const handleSave = () => {
+    setProfile(draft);
+    setEditing(false);
+    toast.success("Profile updated successfully");
+  };
+
+  const field = (key, label, type = "text") => (
+    <div className="space-y-1.5">
+      <Label>{label}</Label>
+      {editing ? (
+        type === "textarea" ? (
+          <Textarea value={draft[key]} onChange={(e) => setDraft({ ...draft, [key]: e.target.value })} rows={4} />
+        ) : (
+          <Input value={draft[key]} onChange={(e) => setDraft({ ...draft, [key]: e.target.value })} />
+        )
+      ) : (
+        <p className="text-sm text-foreground">{profile[key]}</p>
+      )}
+    </div>
+  );
 
   return (
-    <div className="space-y-6">
-      <PageHeader title="My Profile" subtitle="Manage your personal and academic information" icon={GraduationCap} actionLabel="Edit Profile" actionTo="/student/profile" />
+    <div>
+      <PageHeader
+        title="My Profile"
+        description="Manage your personal information, education and skill snapshot."
+        action={
+          editing ? (
+            <Button onClick={handleSave}><Check className="h-4 w-4" /> Save Changes</Button>
+          ) : (
+            <Button variant="outline" onClick={() => { setDraft(profile); setEditing(true); }}>
+              <Pencil className="h-4 w-4" /> Edit Profile
+            </Button>
+          )
+        }
+      />
 
-      <Card className="p-6">
-        <div className="flex flex-col sm:flex-row items-start gap-5">
-          <Avatar name={student.name} size="xl" />
-          <div className="flex-1">
-            <h2 className="text-xl font-bold text-main">{student.name}</h2>
-            <p className="text-sm text-text-secondary mt-0.5">{student.degree} {student.branch} · {student.graduationYear}</p>
-            <div className="mt-3 flex flex-wrap gap-4 text-sm text-text-secondary">
-              <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4" />{student.location}</span>
-              <span className="flex items-center gap-1.5"><Mail className="w-4 h-4" />{student.email}</span>
-              <span className="flex items-center gap-1.5"><Award className="w-4 h-4" />CGPA: {student.cgpa}</span>
-            </div>
-          </div>
-          <Button variant="secondary" size="sm"><Edit3 className="w-4 h-4" />Edit</Button>
-        </div>
-        <div className="mt-5 pt-5 border-t border-border">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-main">Profile Completion</span>
-            <span className="text-sm font-semibold text-primary">{student.profileCompletion}%</span>
-          </div>
-          <Progress value={student.profileCompletion} color="primary" />
-        </div>
-      </Card>
-
-      <div className="grid lg:grid-cols-2 gap-6">
-        <Card className="p-6">
-          <h3 className="font-semibold text-main mb-4">Personal Information</h3>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div><p className="text-text-secondary text-xs">Full Name</p><p className="font-medium text-main mt-0.5">{student.name}</p></div>
-            <div><p className="text-text-secondary text-xs">Email</p><p className="font-medium text-main mt-0.5">{student.email}</p></div>
-            <div><p className="text-text-secondary text-xs">College</p><p className="font-medium text-main mt-0.5">{student.college}</p></div>
-            <div><p className="text-text-secondary text-xs">Degree</p><p className="font-medium text-main mt-0.5">{student.degree}</p></div>
-            <div><p className="text-text-secondary text-xs">Branch</p><p className="font-medium text-main mt-0.5">{student.branch}</p></div>
-            <div><p className="text-text-secondary text-xs">Graduation Year</p><p className="font-medium text-main mt-0.5">{student.graduationYear}</p></div>
-            <div><p className="text-text-secondary text-xs">CGPA</p><p className="font-medium text-main mt-0.5">{student.cgpa}</p></div>
-            <div><p className="text-text-secondary text-xs">Location</p><p className="font-medium text-main mt-0.5">{student.location}</p></div>
-          </div>
-          <div className="mt-4 pt-4 border-t border-border">
-            <p className="text-text-secondary text-xs">About</p>
-            <p className="text-sm text-main mt-1">{student.about}</p>
-          </div>
-        </Card>
-
-        <Card className="p-6">
-          <h3 className="font-semibold text-main mb-4">Education</h3>
-          {student.education.map((edu, i) => (
-            <div key={i} className="rounded-lg border border-border p-4">
-              <div className="flex items-start justify-between">
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2 space-y-6">
+          <Card>
+            <CardHeader><CardTitle>Personal Information</CardTitle></CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center gap-4">
+                <Avatar className="h-16 w-16">
+                  <AvatarFallback className="text-lg">{initials(profile.name)}</AvatarFallback>
+                </Avatar>
                 <div>
-                  <p className="font-medium text-main text-sm">{edu.institution}</p>
-                  <p className="text-xs text-text-secondary mt-0.5">{edu.degree}</p>
-                </div>
-                <Badge variant="primary">{edu.score}</Badge>
-              </div>
-              <p className="text-xs text-text-muted mt-2">{edu.start} — {edu.end}</p>
-            </div>
-          ))}
-          <h3 className="font-semibold text-main mt-5 mb-3">Certifications</h3>
-          <div className="flex flex-wrap gap-2">
-            {student.certifications.map(c => <Badge key={c} variant="info">{c}</Badge>)}
-          </div>
-        </Card>
-      </div>
-
-      <div className="grid lg:grid-cols-2 gap-6">
-        <Card className="p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Code2 className="w-4 h-4 text-primary" />
-            <h3 className="font-semibold text-main">Skills Summary</h3>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {student.skills.map(s => <Badge key={s} variant="primary">{s}</Badge>)}
-          </div>
-          <Link to="/student/skills" className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary hover:gap-2 transition-all">
-            Manage skills <Edit3 className="w-3.5 h-3.5" />
-          </Link>
-        </Card>
-
-        <Card className="p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Briefcase className="w-4 h-4 text-primary" />
-            <h3 className="font-semibold text-main">Projects</h3>
-          </div>
-          <div className="space-y-3">
-            {student.projects.map((p, i) => (
-              <div key={i} className="rounded-lg border border-border p-3">
-                <p className="font-medium text-main text-sm">{p.name}</p>
-                <p className="text-xs text-text-secondary mt-0.5">{p.description}</p>
-                <div className="mt-2 flex flex-wrap gap-1.5">
-                  {p.tech.map(t => <Badge key={t} variant="default">{t}</Badge>)}
+                  <p className="font-semibold text-foreground">{profile.name}</p>
+                  <p className="text-sm text-muted-foreground">{profile.email}</p>
                 </div>
               </div>
-            ))}
-          </div>
-        </Card>
+              <div className="grid gap-4 sm:grid-cols-2">
+                {field("name", "Full Name")}
+                {field("location", "Location")}
+              </div>
+              {field("about", "About", "textarea")}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader><CardTitle>Education</CardTitle></CardHeader>
+            <CardContent className="grid gap-4 sm:grid-cols-2">
+              {field("college", "College")}
+              {field("degree", "Degree")}
+              {field("branch", "Branch")}
+              {field("graduationYear", "Graduation Year")}
+              {field("cgpa", "CGPA")}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader><CardTitle>Skills Snapshot</CardTitle></CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                {STUDENT_SKILLS.map((s) => (
+                  <Badge key={s.id} variant="outline">{s.name} · {s.proficiency}</Badge>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div>
+          <Card>
+            <CardHeader><CardTitle>Profile Completion</CardTitle></CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-muted-foreground">Overall completion</span>
+                <span className="text-sm font-bold text-foreground">{profile.profileCompletion}%</span>
+              </div>
+              <Progress value={profile.profileCompletion} />
+              <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+                <li className="flex items-center gap-2"><Check className="h-3.5 w-3.5 text-success" /> Basic details added</li>
+                <li className="flex items-center gap-2"><Check className="h-3.5 w-3.5 text-success" /> Education added</li>
+                <li className="flex items-center gap-2"><Check className="h-3.5 w-3.5 text-success" /> Skills mapped</li>
+                <li className="flex items-center gap-2 text-subtle"><User className="h-3.5 w-3.5" /> Add a resume file</li>
+              </ul>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

@@ -1,82 +1,104 @@
-import { Link } from 'react-router-dom';
-import {
-  Briefcase, FileText, Star, Calendar, PlusCircle, ArrowRight, Users, TrendingUp,
-} from 'lucide-react';
-import { StatCard } from '@/components/dashboard';
-import { Card, Badge, Button, Avatar } from '@/components/ui';
-import { companyDashboardStats, studentGrowthData } from '@/data/mockAnalytics';
-import { GrowthLineChart } from '@/components/charts';
-import { mockApplications } from '@/data/mockApplications';
+import React from "react";
+import { Link } from "react-router-dom";
+import { Briefcase, Users, Target, TrendingUp, ArrowRight } from "lucide-react";
+import { PageHeader } from "@/components/common/States";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { StatusBadge } from "@/components/applications/ApplicationComponents";
+import { StatCard } from "@/components/dashboard/DashboardWidgets";
+import { CURRENT_COMPANY } from "@/data/mockCompanies";
+import { OPPORTUNITIES } from "@/data/mockOpportunities";
+import { COMPANY_APPLICANTS } from "@/data/mockApplications";
+import { useAuth } from "@/context/AuthContext";
 
 export default function CompanyDashboard() {
-  const recentApps = mockApplications.slice(0, 5);
+  const { user } = useAuth();
+  const company = { ...CURRENT_COMPANY, ...user };
+  const activeOpportunities = OPPORTUNITIES.slice(0, 4);
+  const pipeline = [
+    { stage: "Applied", count: 142 },
+    { stage: "Under Review", count: 58 },
+    { stage: "Shortlisted", count: 26 },
+    { stage: "Interview", count: 12 },
+    { stage: "Selected", count: 5 },
+  ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-main">Company Dashboard</h1>
-          <p className="mt-1 text-sm text-text-secondary">Manage your hiring pipeline and opportunities.</p>
-        </div>
-        <Link to="/company/post-opportunity"><Button><PlusCircle className="w-4 h-4" />Post Opportunity</Button></Link>
+    <div>
+      <PageHeader
+        title={`Welcome back, ${company.name}`}
+        description="Here's an overview of your hiring activity on KaushalVerse."
+        action={<Button asChild><Link to="/company/post-opportunity">Post Opportunity <ArrowRight className="h-4 w-4" /></Link></Button>}
+      />
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard icon={Briefcase} label="Active Opportunities" value={activeOpportunities.length} accent="primary" index={0} />
+        <StatCard icon={Users} label="Total Applications" value="142" accent="secondary" index={1} />
+        <StatCard icon={Target} label="Shortlisted Candidates" value="26" accent="accent" index={2} />
+        <StatCard icon={TrendingUp} label="Interviews Scheduled" value="12" accent="violet" index={3} />
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Active Opportunities" value={12} icon={Briefcase} color="primary" trend="+2" />
-        <StatCard label="Total Applications" value={340} icon={FileText} color="info" trend="+45" />
-        <StatCard label="Shortlisted" value={28} icon={Star} color="secondary" trend="+8" />
-        <StatCard label="Interviews" value={12} icon={Calendar} color="accent" trend="+3" />
-      </div>
-
-      <div className="grid lg:grid-cols-3 gap-6">
-        <Card className="p-6 lg:col-span-2">
-          <h3 className="font-semibold text-main mb-4">Recent Applications</h3>
-          <div className="space-y-1 divide-y divide-border">
-            {recentApps.map(app => (
-              <div key={app.id} className="flex items-center gap-3 py-3">
-                <Avatar name={app.studentName} size="sm" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-main">{app.studentName}</p>
-                  <p className="text-xs text-text-secondary">{app.role} · {app.college}</p>
+      <div className="mt-6 grid gap-6 lg:grid-cols-3">
+        <Card className="lg:col-span-2">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Recent Applicants</CardTitle>
+            <Link to="/company/applications" className="text-sm font-medium text-primary hover:underline">View all</Link>
+          </CardHeader>
+          <CardContent className="divide-y divide-border">
+            {COMPANY_APPLICANTS.slice(0, 4).map((c) => (
+              <div key={c.id} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
+                <div>
+                  <p className="text-sm font-medium text-foreground">{c.name}</p>
+                  <p className="text-xs text-muted-foreground">{c.college} · {c.match}% match</p>
                 </div>
-                <div className="text-center shrink-0">
-                  <p className="text-sm font-bold text-primary">{app.matchScore}%</p>
-                  <p className="text-xs text-text-muted">match</p>
-                </div>
-                <Badge variant={app.status === 'Selected' ? 'success' : app.status === 'Rejected' ? 'error' : app.status === 'Interview' ? 'violet' : app.status === 'Shortlisted' ? 'primary' : 'info'}>
-                  {app.status}
-                </Badge>
+                <StatusBadge status={c.status} />
               </div>
             ))}
-          </div>
-          <Link to="/company/applications" className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary hover:gap-2 transition-all">
-            View all applications <ArrowRight className="w-4 h-4" />
-          </Link>
+          </CardContent>
         </Card>
 
-        <Card className="p-6">
-          <h3 className="font-semibold text-main mb-4 flex items-center gap-2"><TrendingUp className="w-4 h-4 text-primary" />Application Trends</h3>
-          <GrowthLineChart data={studentGrowthData.slice(-6)} keys={[{ key: 'students', color: '#0F766E', label: 'Applications' }]} height={220} />
+        <Card>
+          <CardHeader><CardTitle>Hiring Pipeline</CardTitle></CardHeader>
+          <CardContent className="space-y-3">
+            {pipeline.map((p) => (
+              <div key={p.stage} className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">{p.stage}</span>
+                <span className="font-semibold text-foreground">{p.count}</span>
+              </div>
+            ))}
+          </CardContent>
         </Card>
       </div>
 
-      <Card className="p-6">
-        <h3 className="font-semibold text-main mb-4 flex items-center gap-2"><Users className="w-4 h-4 text-primary" />Hiring Pipeline</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
-          {[
-            { label: 'Applied', count: 340, color: 'bg-slate-100 text-slate-700' },
-            { label: 'Under Review', count: 120, color: 'bg-sky-100 text-info' },
-            { label: 'Shortlisted', count: 28, color: 'bg-primary-light text-primary' },
-            { label: 'Interview', count: 12, color: 'bg-violet-light text-violet' },
-            { label: 'Selected', count: 5, color: 'bg-green-100 text-success' },
-            { label: 'Rejected', count: 15, color: 'bg-red-100 text-error' },
-          ].map(stage => (
-            <div key={stage.label} className="rounded-lg border border-border p-4 text-center">
-              <div className={`w-10 h-10 rounded-lg ${stage.color} flex items-center justify-center mx-auto mb-2 text-sm font-bold`}>{stage.count}</div>
-              <p className="text-xs font-medium text-text-secondary">{stage.label}</p>
-            </div>
-          ))}
-        </div>
+      <Card className="mt-6">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>Active Opportunities</CardTitle>
+          <Link to="/company/opportunities" className="text-sm font-medium text-primary hover:underline">Manage all</Link>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border text-left text-xs text-muted-foreground">
+                  <th className="px-5 py-3 font-medium">Role</th>
+                  <th className="px-5 py-3 font-medium">Type</th>
+                  <th className="px-5 py-3 font-medium">Location</th>
+                  <th className="px-5 py-3 font-medium">Deadline</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {activeOpportunities.map((o) => (
+                  <tr key={o.id}>
+                    <td className="px-5 py-3.5 font-medium text-foreground whitespace-nowrap">{o.title}</td>
+                    <td className="px-5 py-3.5 text-muted-foreground whitespace-nowrap">{o.type}</td>
+                    <td className="px-5 py-3.5 text-muted-foreground whitespace-nowrap">{o.location}</td>
+                    <td className="px-5 py-3.5 text-muted-foreground whitespace-nowrap">{o.deadline}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
       </Card>
     </div>
   );

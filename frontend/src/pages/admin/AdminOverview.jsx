@@ -1,50 +1,30 @@
-import { LayoutDashboard, Users, Building2, Briefcase, FileText, Award, Target } from 'lucide-react';
-import { StatCard } from '@/components/dashboard';
-import { Card } from '@/components/ui';
-import { GrowthLineChart, SimpleBarChart, DemandPieChart } from '@/components/charts';
-import { studentGrowthData, industryDistribution, topHiringSkills, roleDemandData } from '@/data/mockAnalytics';
+import React from "react";
+import { GraduationCap, Building2, Briefcase, FileText, Award, Target } from "lucide-react";
+import { PageHeader } from "@/components/common/States";
+import { StatCard } from "@/components/dashboard/DashboardWidgets";
+import { TrendChart, BarTrendChart } from "@/components/charts/ChartComponents";
+import { ADMIN_OVERVIEW, STUDENT_GROWTH, OPPORTUNITY_GROWTH, TOP_HIRING_SKILLS } from "@/data/mockAnalytics";
 
 export default function AdminOverview() {
-  const stats = [
-    { label: 'Total Students', value: 10000, suffix: '+', icon: Users, color: 'primary', trend: '+12%' },
-    { label: 'Companies', value: 500, suffix: '+', icon: Building2, color: 'info', trend: '+8%' },
-    { label: 'Opportunities', value: 2500, suffix: '+', icon: Briefcase, color: 'accent', trend: '+15%' },
-    { label: 'Applications', value: 18500, icon: FileText, color: 'violet', trend: '+22%' },
-    { label: 'Placements', value: 1620, icon: Award, color: 'secondary', trend: '+18%' },
-    { label: 'Avg. Match', value: 85, suffix: '%', icon: Target, color: 'primary', trend: '+5%' },
-  ];
-
+  const o = ADMIN_OVERVIEW;
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-main">Platform Overview</h1>
-        <p className="mt-1 text-sm text-text-secondary">Ecosystem-wide statistics and growth trends.</p>
+    <div>
+      <PageHeader title="Institution Overview" description="Platform-wide activity across students, companies and placements." />
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        <StatCard icon={GraduationCap} label="Total Students" value={o.totalStudents.toLocaleString()} accent="primary" index={0} />
+        <StatCard icon={Building2} label="Companies" value={o.registeredCompanies} accent="secondary" index={1} />
+        <StatCard icon={Briefcase} label="Active Opportunities" value={o.activeOpportunities.toLocaleString()} accent="accent" index={2} />
+        <StatCard icon={FileText} label="Applications" value={o.applications.toLocaleString()} accent="violet" index={3} />
+        <StatCard icon={Award} label="Placements" value={o.placements.toLocaleString()} accent="primary" index={4} />
+        <StatCard icon={Target} label="Avg. Skill Match" value={`${o.avgSkillMatch}%`} accent="secondary" index={5} />
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-        {stats.map((s, i) => <StatCard key={i} {...s} />)}
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <TrendChart title="Student Growth" description="Registered students over time" data={STUDENT_GROWTH} xKey="month" yKey="students" color="#0F766E" />
+        <TrendChart title="Opportunity Growth" description="New opportunities posted over time" data={OPPORTUNITY_GROWTH} xKey="month" yKey="opportunities" color="#F97316" />
       </div>
-
-      <div className="grid lg:grid-cols-2 gap-6">
-        <Card className="p-6">
-          <h3 className="font-semibold text-main mb-4">Student & Company Growth</h3>
-          <GrowthLineChart data={studentGrowthData} keys={[
-            { key: 'students', color: '#0F766E', label: 'Students' },
-            { key: 'companies', color: '#F97316', label: 'Companies' },
-          ]} height={300} />
-        </Card>
-        <Card className="p-6">
-          <h3 className="font-semibold text-main mb-4">Industry Distribution</h3>
-          <DemandPieChart data={industryDistribution} height={300} />
-        </Card>
-        <Card className="p-6">
-          <h3 className="font-semibold text-main mb-4">Top Hiring Skills</h3>
-          <SimpleBarChart data={topHiringSkills} xKey="skill" bars={[{ key: 'hires', color: '#0F766E', label: 'Hires' }]} height={280} />
-        </Card>
-        <Card className="p-6">
-          <h3 className="font-semibold text-main mb-4">Role Demand</h3>
-          <SimpleBarChart data={roleDemandData} xKey="role" bars={[{ key: 'demand', color: '#7C3AED', label: 'Openings' }]} height={280} />
-        </Card>
+      <div className="mt-6">
+        <BarTrendChart title="Top Skills Platform-wide" description="Most common skills among registered students" data={TOP_HIRING_SKILLS} xKey="skill" yKey="hires" color="#059669" />
       </div>
     </div>
   );

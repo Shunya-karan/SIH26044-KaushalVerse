@@ -1,61 +1,60 @@
-import { BarChart3, TrendingUp, Flame, Sparkles } from 'lucide-react';
-import { PageHeader } from '@/components/common/Shared';
-import { Card, Badge } from '@/components/ui';
-import { SkillDemandChart, DemandPieChart, GrowthLineChart, SimpleBarChart } from '@/components/charts';
-import {
-  skillDemandData, emergingSkills, roleDemandData, industryDistribution, studentGrowthData,
-} from '@/data/mockAnalytics';
+import React from "react";
+import { PageHeader, SectionLabel } from "@/components/common/States";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { DemoBadge } from "@/components/common/Misc";
+import { BarTrendChart } from "@/components/charts/ChartComponents";
+import { SKILL_DEMAND_TRENDS, EMERGING_SKILLS } from "@/data/mockSkills";
+import { TrendingUp } from "lucide-react";
+
+const chartData = SKILL_DEMAND_TRENDS.map((s) => ({ skill: s.skill, demand: s.demand }));
 
 export default function CareerInsights() {
   return (
-    <div className="space-y-6">
-      <PageHeader title="Career Insights" subtitle="Industry trends and skill demand analysis" icon={BarChart3} />
+    <div>
+      <PageHeader title="Career Insights" description="Industry skill trends and role demand to guide your learning." action={<DemoBadge />} />
 
-      <div className="grid lg:grid-cols-2 gap-6">
-        <Card className="p-6">
-          <h3 className="font-semibold text-main mb-1 flex items-center gap-2"><TrendingUp className="w-4 h-4 text-primary" />Most Demanded Skills</h3>
-          <p className="text-xs text-text-muted mb-4">Based on current job postings across industries</p>
-          <SkillDemandChart data={skillDemandData} height={300} />
-        </Card>
-
-        <Card className="p-6">
-          <h3 className="font-semibold text-main mb-1 flex items-center gap-2"><Flame className="w-4 h-4 text-accent" />Emerging Technologies</h3>
-          <p className="text-xs text-text-muted mb-4">Fastest growing skills by year-over-year growth</p>
-          <div className="space-y-3">
-            {emergingSkills.map(s => (
-              <div key={s.skill} className="flex items-center justify-between">
-                <span className="text-sm font-medium text-main">{s.skill}</span>
-                <div className="flex items-center gap-2">
-                  <div className="w-24 h-2 rounded-full bg-slate-200">
-                    <div className="h-full rounded-full bg-accent" style={{ width: `${Math.min(100, s.growth)}%` }} />
-                  </div>
-                  <Badge variant="accent">+{s.growth}%</Badge>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        <Card className="p-6">
-          <h3 className="font-semibold text-main mb-1 flex items-center gap-2"><BarChart3 className="w-4 h-4 text-primary" />Role Demand</h3>
-          <p className="text-xs text-text-muted mb-4">Open positions by role across all industries</p>
-          <SimpleBarChart data={roleDemandData} xKey="role" bars={[{ key: 'demand', color: '#0F766E', label: 'Openings' }]} height={280} />
-        </Card>
-
-        <Card className="p-6">
-          <h3 className="font-semibold text-main mb-1 flex items-center gap-2"><Sparkles className="w-4 h-4 text-violet" />Industry Distribution</h3>
-          <p className="text-xs text-text-muted mb-4">Opportunity distribution across industries</p>
-          <DemandPieChart data={industryDistribution} height={280} />
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <BarTrendChart title="Most Demanded Skills" description="Relative industry demand score (0–100)" data={chartData} xKey="skill" yKey="demand" color="#0F766E" />
+        </div>
+        <Card>
+          <CardHeader className="flex-row items-center gap-2 space-y-0"><TrendingUp className="h-5 w-5 text-secondary" /><CardTitle>Emerging Technologies</CardTitle></CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {EMERGING_SKILLS.map((s) => <Badge key={s} variant="secondary">{s}</Badge>)}
+            </div>
+            <p className="mt-4 text-xs text-muted-foreground">
+              Skills gaining traction across industry job postings on the platform (sample data).
+            </p>
+          </CardContent>
         </Card>
       </div>
 
-      <Card className="p-6">
-        <h3 className="font-semibold text-main mb-1">Platform Growth Trends</h3>
-        <p className="text-xs text-text-muted mb-4">Students and companies joining KaushalVerse over time</p>
-        <GrowthLineChart data={studentGrowthData} keys={[
-          { key: 'students', color: '#0F766E', label: 'Students' },
-          { key: 'companies', color: '#F97316', label: 'Companies' },
-        ]} height={300} />
+      <Card className="mt-6">
+        <CardHeader><CardTitle>Skill Demand Detail</CardTitle></CardHeader>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border text-left text-xs text-muted-foreground">
+                  <th className="px-5 py-3 font-medium">Skill</th>
+                  <th className="px-5 py-3 font-medium">Demand Score</th>
+                  <th className="px-5 py-3 font-medium">Trend</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {SKILL_DEMAND_TRENDS.map((s) => (
+                  <tr key={s.skill}>
+                    <td className="px-5 py-3.5 font-medium text-foreground">{s.skill}</td>
+                    <td className="px-5 py-3.5 text-muted-foreground">{s.demand}/100</td>
+                    <td className="px-5 py-3.5"><Badge variant={s.trend.includes("Very") ? "success" : s.trend === "Growing" ? "info" : s.trend === "Emerging" ? "violet" : "muted"}>{s.trend}</Badge></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
       </Card>
     </div>
   );

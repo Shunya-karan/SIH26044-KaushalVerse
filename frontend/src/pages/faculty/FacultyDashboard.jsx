@@ -1,0 +1,13 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowRight, BookOpenCheck, BriefcaseBusiness, Target, Users } from 'lucide-react';
+import { PageHeader } from '@/components/common/States';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { FACULTY_STUDENTS, INDUSTRY_DEMAND } from '@/data/sihDemoData';
+
+export default function FacultyDashboard(){ return <div><PageHeader title="Faculty Dashboard" description="Monitor student readiness and turn industry requirements into targeted mentoring." />
+ <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><Card><CardContent className="p-5"><Users className="h-5 w-5 text-primary"/><p className="mt-3 text-xs text-muted-foreground">Students assigned</p><p className="text-2xl font-bold">24</p></CardContent></Card><Card><CardContent className="p-5"><Target className="h-5 w-5 text-secondary"/><p className="mt-3 text-xs text-muted-foreground">Avg readiness</p><p className="text-2xl font-bold">81%</p></CardContent></Card><Card><CardContent className="p-5"><BriefcaseBusiness className="h-5 w-5 text-accent"/><p className="mt-3 text-xs text-muted-foreground">Internships active</p><p className="text-2xl font-bold">12</p></CardContent></Card><Card><CardContent className="p-5"><BookOpenCheck className="h-5 w-5 text-roadmap"/><p className="mt-3 text-xs text-muted-foreground">Mentor actions</p><p className="text-2xl font-bold">8</p></CardContent></Card></div>
+ <div className="mt-6 grid gap-6 lg:grid-cols-[1.4fr_.8fr]"><Card><CardHeader><CardTitle>Students needing attention</CardTitle></CardHeader><CardContent className="space-y-3">{FACULTY_STUDENTS.map(s=><div key={s.name} className="flex flex-col gap-3 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-medium">{s.name}</p><p className="text-xs text-muted-foreground">Gap: {s.gap} · Internship: {s.internship}</p></div><div className="flex items-center gap-2"><Badge variant={s.status==='Placement ready'?'success':'warning'}>{s.readiness}% ready</Badge><Button size="sm" variant="outline" asChild><Link to="/faculty/students">View</Link></Button></div></div>)}</CardContent></Card>
+ <Card><CardHeader><CardTitle>Industry signal</CardTitle></CardHeader><CardContent className="space-y-3">{INDUSTRY_DEMAND.slice(0,3).map(d=><div key={d.skill} className="flex items-center justify-between rounded-lg bg-muted p-3"><div><p className="text-sm font-medium">{d.skill}</p><p className="text-xs text-muted-foreground">Demand {d.demandScore}%</p></div><Badge variant="outline">{d.trend}</Badge></div>)}</CardContent></Card></div></div> }

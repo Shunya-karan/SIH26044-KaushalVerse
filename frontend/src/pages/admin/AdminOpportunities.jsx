@@ -1,40 +1,42 @@
-import { Briefcase } from 'lucide-react';
-import { PageHeader } from '@/components/common/Shared';
-import { Card, Badge } from '@/components/ui';
-import { mockOpportunities } from '@/data/mockOpportunities';
+import React from "react";
+import { PageHeader } from "@/components/common/States";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { OPPORTUNITIES } from "@/data/mockOpportunities";
 
 export default function AdminOpportunities() {
   return (
-    <div className="space-y-6">
-      <PageHeader title="Opportunities" subtitle="All platform opportunities overview" icon={Briefcase} />
-
-      <Card className="overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-bg border-b border-border">
-              <tr>
-                <th className="text-left px-4 py-3 font-medium text-text-secondary">Title</th>
-                <th className="text-left px-4 py-3 font-medium text-text-secondary">Company</th>
-                <th className="text-left px-4 py-3 font-medium text-text-secondary">Type</th>
-                <th className="text-left px-4 py-3 font-medium text-text-secondary">Location</th>
-                <th className="text-left px-4 py-3 font-medium text-text-secondary">Deadline</th>
-                <th className="text-left px-4 py-3 font-medium text-text-secondary">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {mockOpportunities.map(o => (
-                <tr key={o.id} className="hover:bg-bg/50">
-                  <td className="px-4 py-3 font-medium text-main">{o.title}</td>
-                  <td className="px-4 py-3 text-text-secondary">{o.companyName}</td>
-                  <td className="px-4 py-3"><Badge variant={o.type === 'Internship' ? 'primary' : o.type === 'Job' ? 'secondary' : 'accent'}>{o.type}</Badge></td>
-                  <td className="px-4 py-3 text-text-secondary">{o.location}</td>
-                  <td className="px-4 py-3 text-text-secondary">{o.deadline}</td>
-                  <td className="px-4 py-3"><Badge variant="success">{o.status}</Badge></td>
+    <div>
+      <PageHeader title="Opportunities" description="All internships, jobs and projects posted platform-wide." />
+      <Card>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border text-left text-xs text-muted-foreground">
+                  <th className="px-5 py-3 font-medium">Title</th>
+                  <th className="px-5 py-3 font-medium">Company</th>
+                  <th className="px-5 py-3 font-medium">Type</th>
+                  <th className="px-5 py-3 font-medium">Location</th>
+                  <th className="px-5 py-3 font-medium">Posted</th>
+                  <th className="px-5 py-3 font-medium">Deadline</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {OPPORTUNITIES.map((o) => (
+                  <tr key={o.id} className="hover:bg-muted/40">
+                    <td className="px-5 py-3.5 font-medium text-foreground whitespace-nowrap">{o.title}</td>
+                    <td className="px-5 py-3.5 text-muted-foreground whitespace-nowrap">{o.company}</td>
+                    <td className="px-5 py-3.5"><Badge variant="muted">{o.type}</Badge></td>
+                    <td className="px-5 py-3.5 text-muted-foreground whitespace-nowrap">{o.location}</td>
+                    <td className="px-5 py-3.5 text-muted-foreground whitespace-nowrap">{o.postedDate}</td>
+                    <td className="px-5 py-3.5 text-muted-foreground whitespace-nowrap">{o.deadline}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
       </Card>
     </div>
   );

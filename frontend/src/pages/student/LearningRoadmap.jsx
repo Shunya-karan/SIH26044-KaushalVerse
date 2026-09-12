@@ -1,82 +1,22 @@
-import { Route, CheckCircle2, Clock, Circle, BookOpen, Zap } from 'lucide-react';
-import { PageHeader } from '@/components/common/Shared';
-import { Card, Badge, Progress } from '@/components/ui';
-import { learningRoadmap } from '@/data/mockAnalytics';
+import React from 'react';
+import { ArrowRight, CheckCircle2, Circle, Clock, Lightbulb, PlayCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { PageHeader } from '@/components/common/States';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
+import { ROADMAP_STEPS } from '@/data/sihDemoData';
+import { useSIH } from '@/context/SIHContext';
 
 export default function LearningRoadmap() {
-  const statusConfig = {
-    'Completed': { icon: CheckCircle2, color: 'text-success', bg: 'bg-green-100', badge: 'success' },
-    'In Progress': { icon: Clock, color: 'text-violet', bg: 'bg-violet-light', badge: 'violet' },
-    'Upcoming': { icon: Circle, color: 'text-text-muted', bg: 'bg-slate-100', badge: 'default' },
-  };
-
-  return (
-    <div className="space-y-6">
-      <PageHeader title="Learning Roadmap" subtitle="Personalized recommendation preview — your path to becoming a Full Stack Developer" icon={Route} />
-
-      <Card className="p-5 bg-violet-light/30 border-violet/20">
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-lg bg-violet text-white flex items-center justify-center shrink-0">
-            <Zap className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-main">Goal: Become a Full Stack Developer</h3>
-            <p className="text-sm text-text-secondary mt-1">Estimated total duration: 29 weeks · 5 phases · Personalized recommendation preview</p>
-          </div>
-        </div>
-      </Card>
-
-      <div className="relative">
-        {learningRoadmap.map((phase, i) => {
-          const config = statusConfig[phase.status];
-          const StatusIcon = config.icon;
-          return (
-            <div key={phase.phase} className="relative flex gap-4 pb-6 last:pb-0">
-              {i < learningRoadmap.length - 1 && (
-                <div className="absolute left-5 top-12 bottom-0 w-px bg-border" />
-              )}
-              <div className={`w-10 h-10 rounded-full ${config.bg} flex items-center justify-center shrink-0 z-10`}>
-                <StatusIcon className={`w-5 h-5 ${config.color}`} />
-              </div>
-              <Card className="p-5 flex-1">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-xs font-semibold text-violet">Phase {phase.phase}</p>
-                    <h3 className="font-semibold text-main mt-0.5">{phase.title}</h3>
-                  </div>
-                  <Badge variant={config.badge}>{phase.status}</Badge>
-                </div>
-                <div className="mt-3 flex flex-wrap gap-3 text-xs text-text-secondary">
-                  <span>Duration: {phase.duration}</span>
-                  <span>·</span>
-                  <span>Difficulty: {phase.difficulty}</span>
-                </div>
-                {phase.status !== 'Upcoming' && (
-                  <div className="mt-3">
-                    <div className="flex items-center justify-between text-xs mb-1">
-                      <span className="text-text-secondary">Progress</span>
-                      <span className="font-medium text-main">{phase.progress}%</span>
-                    </div>
-                    <Progress value={phase.progress} color={phase.status === 'Completed' ? 'success' : 'violet'} />
-                  </div>
-                )}
-                <div className="mt-4">
-                  <p className="text-xs font-medium text-main mb-1.5">Skills Gained</p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {phase.skillsGained.map(s => <Badge key={s} variant="violet">{s}</Badge>)}
-                  </div>
-                </div>
-                <div className="mt-3">
-                  <p className="text-xs font-medium text-main mb-1.5 flex items-center gap-1"><BookOpen className="w-3 h-3" />Recommended Resources</p>
-                  <ul className="space-y-1">
-                    {phase.resources.map(r => <li key={r} className="text-xs text-text-secondary">· {r}</li>)}
-                  </ul>
-                </div>
-              </Card>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
+  const { assessmentCompleted, improved } = useSIH();
+  const completed = assessmentCompleted ? 3 : 1;
+  const progress = improved ? 100 : Math.round((completed / ROADMAP_STEPS.length) * 100);
+  return <div>
+    <PageHeader title="Learning & Growth Roadmap" description="Your roadmap is driven by the largest gaps against the Healthcare Data Analyst competency blueprint." action={<Button asChild><Link to="/student/skill-gap">View Skill Gap <ArrowRight className="h-4 w-4" /></Link></Button>} />
+    <Card className="mb-6 border-roadmap/20 bg-roadmap-light/30"><CardContent className="p-5"><div className="flex items-center justify-between"><div><Badge variant="violet">Gap-driven recommendation</Badge><p className="mt-2 text-sm font-medium">Priority skill: Power BI</p><p className="text-xs text-muted-foreground">Reason: largest role gap + high industry demand.</p></div><span className="text-sm font-bold">{progress}% complete</span></div><Progress className="mt-4" value={progress} indicatorClassName="bg-roadmap" /></CardContent></Card>
+    <div className="relative space-y-4">{ROADMAP_STEPS.map((step, i) => { const done = improved || (assessmentCompleted && i < 3) || (!assessmentCompleted && i === 0); const Icon = done ? CheckCircle2 : i === 1 ? PlayCircle : Circle; return <Card key={step.id} className={done ? 'border-success/20' : ''}><CardContent className="p-5"><div className="flex gap-4"><div className={`mt-0.5 rounded-full ${done ? 'bg-success/10' : 'bg-muted'} p-2`}><Icon className={`h-5 w-5 ${done ? 'text-success' : 'text-roadmap'}`} /></div><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center justify-between gap-2"><div><p className="font-semibold">{step.title}</p><p className="text-xs text-muted-foreground">{step.type} · {step.skill}</p></div><Badge variant={done ? 'success' : 'outline'}>{done ? 'Completed' : 'Recommended'}</Badge></div><p className="mt-2 text-sm text-muted-foreground">{step.reason}</p><div className="mt-3 flex flex-wrap gap-3 text-xs text-muted-foreground"><span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5"/>{step.duration}</span><span>{step.difficulty}</span><span>Expected {step.expected}</span></div><Progress className="mt-3" value={done ? 100 : step.progress} /></div></div></CardContent></Card>})}</div>
+    <Card className="mt-6"><CardHeader><CardTitle className="flex items-center gap-2"><Lightbulb className="h-5 w-5 text-primary"/>The closed-loop journey</CardTitle></CardHeader><CardContent><div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground"><Badge>Skill Gap</Badge><ArrowRight className="h-4 w-4"/><Badge>Learning</Badge><ArrowRight className="h-4 w-4"/><Badge>Project</Badge><ArrowRight className="h-4 w-4"/><Badge>Assessment</Badge><ArrowRight className="h-4 w-4"/><Badge>Improved Skill</Badge><ArrowRight className="h-4 w-4"/><Badge>Re-match</Badge></div></CardContent></Card>
+  </div>;
 }

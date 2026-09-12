@@ -1,97 +1,106 @@
-import { useState } from 'react';
-import { FileCheck2, Upload, Zap, CheckCircle2, AlertCircle, TrendingUp } from 'lucide-react';
-import { PageHeader } from '@/components/common/Shared';
-import { Card, Badge, Button, Progress } from '@/components/ui';
-import { SimpleBarChart } from '@/components/charts';
-import { resumeAnalysisData } from '@/data/mockAnalytics';
+import React, { useState } from "react";
+import { toast } from "sonner";
+import { Upload, FileCheck, Lightbulb, RefreshCcw } from "lucide-react";
+import { PageHeader } from "@/components/common/States";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { DemoBadge } from "@/components/common/Misc";
+import { MatchScore } from "@/components/dashboard/DashboardWidgets";
+import { RESUME_ANALYSIS } from "@/data/mockRoadmap";
 
 export default function ResumeIntelligence() {
   const [uploaded, setUploaded] = useState(false);
-  const data = resumeAnalysisData;
+  const [analyzing, setAnalyzing] = useState(false);
+
+  const handleUpload = () => {
+    setAnalyzing(true);
+    setTimeout(() => {
+      setAnalyzing(false);
+      setUploaded(true);
+      toast.success("Resume analyzed successfully");
+    }, 1200);
+  };
 
   return (
-    <div className="space-y-6">
-      <PageHeader title="Resume Intelligence" subtitle="AI Resume Analysis — Demo" icon={FileCheck2} />
-
-      <Card className="p-4 bg-violet-light/30 border-violet/20">
-        <p className="text-xs text-violet">This is a demo feature. No actual AI processing occurs. Results are simulated for conceptual demonstration.</p>
-      </Card>
+    <div>
+      <PageHeader title="Resume Intelligence" description="Get an instant score, ATS readiness check and improvement tips." action={<DemoBadge />} />
 
       {!uploaded ? (
-        <Card className="p-8">
-          <div className="rounded-xl border-2 border-dashed border-border p-12 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-primary-soft text-primary flex items-center justify-center mx-auto mb-4">
-              <Upload className="w-8 h-8" />
-            </div>
-            <h3 className="text-lg font-semibold text-main">Upload your resume</h3>
-            <p className="mt-2 text-sm text-text-secondary">Upload your resume to get instant analysis, ATS readiness score, and personalized recommendations.</p>
-            <p className="mt-1 text-xs text-text-muted">Supports PDF, DOC, DOCX up to 5MB</p>
-            <Button className="mt-5" onClick={() => setUploaded(true)}><Upload className="w-4 h-4" />Upload Resume</Button>
-          </div>
+        <Card>
+          <CardContent className="p-10">
+            <button
+              onClick={handleUpload}
+              disabled={analyzing}
+              className="flex w-full flex-col items-center gap-3 rounded-xl border-2 border-dashed border-border p-10 text-center hover:border-primary transition-colors disabled:opacity-60"
+            >
+              <Upload className="h-9 w-9 text-subtle" />
+              <span className="font-medium text-foreground">{analyzing ? "Analyzing resume..." : "Upload your resume"}</span>
+              <span className="text-xs text-muted-foreground">PDF or DOCX, up to 5MB — AI Resume Analysis (Demo)</span>
+            </button>
+          </CardContent>
         </Card>
       ) : (
-        <>
-          <div className="grid lg:grid-cols-3 gap-6">
-            <Card className="p-6 flex flex-col items-center justify-center">
-              <div className="relative w-32 h-32 flex items-center justify-center">
-                <svg className="absolute inset-0 -rotate-90" viewBox="0 0 128 128">
-                  <circle cx="64" cy="64" r="56" fill="none" stroke="#E2E8F0" strokeWidth="8" />
-                  <circle cx="64" cy="64" r="56" fill="none" stroke="#0F766E" strokeWidth="8" strokeDasharray={2 * Math.PI * 56} strokeDashoffset={2 * Math.PI * 56 * (1 - data.score / 100)} strokeLinecap="round" className="transition-all duration-700" />
-                </svg>
-                <div className="text-center">
-                  <p className="text-3xl font-bold text-primary">{data.score}</p>
-                  <p className="text-xs text-text-secondary">out of 100</p>
+        <div className="space-y-6">
+          <Card>
+            <CardContent className="p-6 flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
+              <div className="flex items-center gap-4">
+                <MatchScore score={RESUME_ANALYSIS.score} size="lg" />
+                <div>
+                  <p className="font-semibold text-foreground">Resume Score: {RESUME_ANALYSIS.score}/100</p>
+                  <p className="text-sm text-muted-foreground flex items-center gap-1.5"><FileCheck className="h-3.5 w-3.5 text-success" /> resume_aarav_sharma.pdf</p>
                 </div>
               </div>
-              <p className="mt-3 text-sm font-medium text-main">Resume Score</p>
-              <Button variant="secondary" size="sm" className="mt-3" onClick={() => setUploaded(false)}>Upload New</Button>
-            </Card>
+              <Button variant="outline" onClick={() => setUploaded(false)}>
+                <RefreshCcw className="h-4 w-4" /> Re-upload
+              </Button>
+            </CardContent>
+          </Card>
 
-            <Card className="p-6">
-              <h3 className="font-semibold text-main mb-3 flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-success" />Skills Detected</h3>
-              <div className="flex flex-wrap gap-2">
-                {data.sections.skillsDetected.map(s => <Badge key={s} variant="success">{s}</Badge>)}
-              </div>
-              <div className="mt-4 space-y-2 text-sm">
-                <div className="flex justify-between"><span className="text-text-secondary">Experience</span><span className="font-medium text-main">{data.sections.experience}</span></div>
-                <div className="flex justify-between"><span className="text-text-secondary">Education</span><span className="font-medium text-main text-xs">{data.sections.education}</span></div>
-                <div className="flex justify-between"><span className="text-text-secondary">Projects Found</span><span className="font-medium text-main">{data.sections.projects}</span></div>
-              </div>
-            </Card>
-
-            <Card className="p-6">
-              <h3 className="font-semibold text-main mb-3 flex items-center gap-2"><AlertCircle className="w-4 h-4 text-error" />Missing Keywords</h3>
-              <div className="flex flex-wrap gap-2">
-                {data.missingKeywords.map(s => <Badge key={s} variant="error">{s}</Badge>)}
-              </div>
-              <div className="mt-4 pt-4 border-t border-border">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-main">ATS Readiness</span>
-                  <span className="text-sm font-semibold text-warning">{data.atsReadiness}%</span>
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Card>
+              <CardHeader><CardTitle>Resume Breakdown</CardTitle></CardHeader>
+              <CardContent className="space-y-4 text-sm">
+                <div>
+                  <p className="text-muted-foreground mb-1.5">Skills Detected</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {RESUME_ANALYSIS.sections.skillsDetected.map((s) => <Badge key={s} variant="success">{s}</Badge>)}
+                  </div>
                 </div>
-                <Progress value={data.atsReadiness} color="warning" />
-                <p className="mt-2 text-xs text-text-muted">Applicant Tracking System compatibility score</p>
-              </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><p className="text-muted-foreground">Experience</p><p className="text-foreground font-medium">{RESUME_ANALYSIS.sections.experience}</p></div>
+                  <div><p className="text-muted-foreground">Projects</p><p className="text-foreground font-medium">{RESUME_ANALYSIS.sections.projects} listed</p></div>
+                </div>
+                <div><p className="text-muted-foreground">Education</p><p className="text-foreground font-medium">{RESUME_ANALYSIS.sections.education}</p></div>
+                <div>
+                  <div className="flex justify-between mb-1"><p className="text-muted-foreground">ATS Readiness</p><p className="font-medium text-foreground">{RESUME_ANALYSIS.sections.atsReadiness}%</p></div>
+                  <Progress value={RESUME_ANALYSIS.sections.atsReadiness} />
+                </div>
+                <div>
+                  <p className="text-muted-foreground mb-1.5">Missing Keywords</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {RESUME_ANALYSIS.sections.missingKeywords.map((s) => <Badge key={s} variant="error">{s}</Badge>)}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex-row items-center gap-2 space-y-0"><Lightbulb className="h-5 w-5 text-accent" /><CardTitle>Recommendations</CardTitle></CardHeader>
+              <CardContent>
+                <ul className="space-y-3">
+                  {RESUME_ANALYSIS.recommendations.map((r, i) => (
+                    <li key={i} className="flex items-start gap-2.5 text-sm text-foreground rounded-lg border border-border p-3">
+                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent-light text-xs font-bold text-accent">{i + 1}</span>
+                      {r}
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
             </Card>
           </div>
-
-          <Card className="p-6">
-            <h3 className="font-semibold text-main mb-4">Section-wise Scores</h3>
-            <SimpleBarChart data={data.sectionScores} xKey="section" bars={[{ key: 'score', color: '#0F766E', label: 'Score' }]} height={250} />
-          </Card>
-
-          <Card className="p-6">
-            <h3 className="font-semibold text-main mb-4 flex items-center gap-2"><Zap className="w-4 h-4 text-violet" />Recommendations</h3>
-            <div className="space-y-3">
-              {data.recommendations.map((rec, i) => (
-                <div key={i} className="flex items-start gap-3 rounded-lg border border-border p-3">
-                  <div className="w-6 h-6 rounded-full bg-violet-light text-violet flex items-center justify-center text-xs font-bold shrink-0">{i + 1}</div>
-                  <p className="text-sm text-text-secondary">{rec}</p>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </>
+        </div>
       )}
     </div>
   );
