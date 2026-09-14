@@ -4,16 +4,12 @@ import { motion } from "framer-motion";
 import {
   ArrowRight,
   PlayCircle,
-  TrendingUp,
   Target,
   Sparkles,
   Landmark,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
 import { SectionLabel } from "@/components/common/States";
 
 const LEADERSHIP_REFERENCES = [
@@ -66,7 +62,6 @@ function GovStrip() {
                 lg:min-w-[240px]
               "
             >
-              {/* Larger portrait */}
               <img
                 src={person.photo}
                 alt={person.name}
@@ -81,7 +76,6 @@ function GovStrip() {
                 "
               />
 
-              {/* Name + designation */}
               <div className="min-w-0 leading-tight">
                 <p className="text-xs font-semibold text-foreground lg:text-sm">
                   {person.name}
@@ -101,132 +95,118 @@ function GovStrip() {
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-orange-100/70 via-accent-light/40 to-background">
+    <section className="relative overflow-hidden bg-gradient-to-b from-orange-100/70 via-accent-light/30 to-background">
+      
       <GovStrip />
 
-      <div className="container-page grid items-center gap-12 py-16 sm:py-20 lg:grid-cols-2 lg:py-24">
-        
-        {/* Left Hero Content */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <SectionLabel>Smart India Hackathon Prototype</SectionLabel>
+      {/* Subtle background glow */}
+      <div className="pointer-events-none absolute left-1/2 top-[42%] h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/10 blur-[110px]" />
 
-          <h1 className="mt-5 text-4xl font-extrabold leading-tight tracking-tight text-foreground sm:text-5xl">
-            Bridging Academia and Industry Through Skills
+      <div className="container-page relative flex min-h-[650px] items-center justify-center py-20 sm:py-24 lg:py-28">
+        
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="mx-auto flex w-full max-w-5xl flex-col items-center text-center"
+        >
+          {/* SIH Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <SectionLabel>
+              Smart India Hackathon 2026 · PS26044
+            </SectionLabel>
+          </motion.div>
+
+          {/* Main Heading */}
+          <h1 className="mt-6 max-w-5xl text-5xl font-extrabold leading-[1.05] tracking-[-0.045em] text-foreground sm:text-6xl lg:text-7xl">
+            Bridging Academia and Industry
+            <span className="block bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+              Through Skills
+            </span>
           </h1>
 
-          <p className="mt-5 max-w-xl text-base text-muted-foreground sm:text-lg">
+          {/* Description */}
+          <p className="mt-7 max-w-3xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8 lg:text-xl">
             KaushalVerse connects students, institutions and industry through
-            intelligent skill mapping, internships, placement opportunities
-            and personalized career pathways.
+            intelligent skill mapping, verified competencies, internships,
+            placement opportunities and personalized career pathways.
           </p>
 
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Button size="lg" asChild>
+          {/* CTA Buttons */}
+          <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Button
+              size="lg"
+              asChild
+              className="h-12 rounded-xl px-7 text-sm font-semibold shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl"
+            >
               <Link to="/register">
                 Explore Opportunities
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="ml-1 h-4 w-4" />
               </Link>
             </Button>
 
-            <Button size="lg" variant="outline" asChild>
+            <Button
+              size="lg"
+              variant="outline"
+              asChild
+              className="h-12 rounded-xl border-border/80 bg-white/70 px-7 text-sm font-semibold backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-white"
+            >
               <Link to="/how-it-works">
-                <PlayCircle className="h-4 w-4" />
+                <PlayCircle className="mr-1 h-4 w-4" />
                 See How It Works
               </Link>
             </Button>
           </div>
-        </motion.div>
 
-        {/* Career Snapshot */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.15 }}
-        >
-          <Card className="shadow-soft">
-            <CardContent className="p-6">
-              
-              <div className="mb-4 flex items-center justify-between">
-                <p className="text-sm font-semibold text-foreground">
-                  Your Career Snapshot
-                </p>
+          {/* Product Value Indicators */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.25 }}
+            className="mt-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-xs font-medium text-muted-foreground sm:text-sm"
+          >
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-accent" />
+              <span>Skill Assessment</span>
+            </div>
 
-                <Badge variant="muted">
-                  Live Preview
-                </Badge>
-              </div>
+            <span className="hidden text-border sm:inline">•</span>
 
-              <div className="mb-4 grid grid-cols-2 gap-4">
-                <div className="rounded-lg border border-border p-3">
-                  <p className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <Sparkles className="h-3.5 w-3.5 text-primary" />
-                    Skill Score
-                  </p>
+            <div className="flex items-center gap-2">
+              <Target className="h-4 w-4 text-accent" />
+              <span>Skill Gap Analysis</span>
+            </div>
 
-                  <p className="mt-1 text-2xl font-bold text-foreground">
-                    78%
-                  </p>
-                </div>
+            <span className="hidden text-border sm:inline">•</span>
 
-                <div className="rounded-lg border border-border p-3">
-                  <p className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <Target className="h-3.5 w-3.5 text-accent" />
-                    Skill Gap
-                  </p>
+            <div className="flex items-center gap-2">
+              <ArrowRight className="h-4 w-4 text-accent" />
+              <span>Industry Matching</span>
+            </div>
 
-                  <p className="mt-1 text-2xl font-bold text-foreground">
-                    22%
-                  </p>
-                </div>
-              </div>
+            <span className="hidden text-border sm:inline">•</span>
 
-              <div className="mb-4">
-                <div className="mb-1 flex justify-between text-xs">
-                  <span className="text-muted-foreground">
-                    Placement Readiness
-                  </span>
+            <div className="flex items-center gap-2">
+              <span className="flex h-4 w-4 items-center justify-center rounded-full border border-accent/50 text-[9px] font-bold text-accent">
+                ✓
+              </span>
+              <span>Placement Pathways</span>
+            </div>
+          </motion.div>
 
-                  <span className="font-semibold text-foreground">
-                    74%
-                  </span>
-                </div>
-
-                <Progress value={74} />
-              </div>
-
-              <div className="mb-3 rounded-lg bg-roadmap-light/50 p-3">
-                <p className="flex items-center gap-1 text-xs font-medium text-roadmap">
-                  <TrendingUp className="h-3.5 w-3.5" />
-                  Recommended Learning Path
-                </p>
-
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Docker → Testing → AWS Fundamentals
-                </p>
-              </div>
-
-              <div className="flex items-center justify-between gap-3 rounded-lg border border-border p-3">
-                <div>
-                  <p className="text-sm font-medium text-foreground">
-                    3 New Internship Matches
-                  </p>
-
-                  <p className="text-xs text-muted-foreground">
-                    Frontend, Backend & Cloud roles
-                  </p>
-                </div>
-
-                <Badge variant="success" className="shrink-0">
-                  92% match
-                </Badge>
-              </div>
-
-            </CardContent>
-          </Card>
+          {/* Bottom trust statement */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="mt-8 text-xs text-muted-foreground/80"
+          >
+            From skill discovery to verified industry readiness
+          </motion.div>
         </motion.div>
       </div>
     </section>
