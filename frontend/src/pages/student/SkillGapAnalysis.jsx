@@ -22,7 +22,7 @@ export default function SkillGapAnalysis() {
   const readiness = Math.round(weighted * 100);
   const gaps = rows.filter((r) => r.gap > 0).sort((a, b) => b.gap - a.gap);
   return <div>
-    <PageHeader title="Skill Gap Analysis" description="Compare your demonstrated capability with the competency blueprint for your target role." action={<Button variant="outline" asChild><Link to="/student/assessment">Take Assessment <ArrowRight className="h-4 w-4" /></Link></Button>} />
+    <PageHeader title="Skill Gap Analysis" description="Compare your demonstrated capability with the competency blueprint for your target role." action={<Button variant="outline" asChild><Link to="/student/skills">Manage Skills <ArrowRight className="h-4 w-4" /></Link></Button>} />
     <Card className="mb-6"><CardContent className="p-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
       <div className="w-full lg:max-w-sm space-y-1.5"><Label>Target Role</Label><Select value={roleId} onValueChange={setRoleId}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="healthcare-analyst">{COMPETENCY_BLUEPRINT.role}</SelectItem>{CAREER_ROLES.map((r) => <SelectItem key={r.id} value={r.id}>{r.name}</SelectItem>)}</SelectContent></Select></div>
       <div className="flex items-center gap-5"><div className="text-right"><p className="text-xs text-muted-foreground">Role readiness</p><p className="text-3xl font-bold">{readiness}%</p></div><div className="w-36"><Progress value={readiness} /></div></div>

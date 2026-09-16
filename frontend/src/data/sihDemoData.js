@@ -108,3 +108,18 @@ export const INTERNSHIP_EVALUATION = {
     { name: 'Teamwork', score: 5 },
   ],
 };
+
+export const FACULTY_ASSESSMENT_ACTIVITY = [
+  { id: 'fa1', student: 'Aarav Sharma', skill: 'Power BI', difficulty: 'Intermediate', score: 48, status: 'Needs retake', date: 'Sep 02, 2026' },
+  { id: 'fa2', student: 'Aarav Sharma', skill: 'Python', difficulty: 'Advanced', score: 82, status: 'Passed', date: 'Sep 06, 2026' },
+  { id: 'fa3', student: 'Priya Nair', skill: 'SQL', difficulty: 'Intermediate', score: 58, status: 'Needs retake', date: 'Sep 04, 2026' },
+  { id: 'fa4', student: 'Priya Nair', skill: 'Statistics', difficulty: 'Intermediate', score: 71, status: 'Passed', date: 'Sep 05, 2026' },
+  { id: 'fa5', student: 'Rohan Mehta', skill: 'Communication', difficulty: 'Advanced', score: 88, status: 'Passed', date: 'Sep 03, 2026' },
+  { id: 'fa6', student: 'Rohan Mehta', skill: 'Healthcare Analytics', difficulty: 'Beginner', score: 64, status: 'Passed', date: 'Sep 07, 2026' },
+];
+
+export const FACULTY_MENTORSHIP_SESSIONS = [
+  { id: 'ms1', student: 'Aarav Sharma', topic: 'Power BI dashboard review', scheduled: 'Sep 18, 2026 · 4:00 PM', status: 'Scheduled', notes: '' },
+  { id: 'ms2', student: 'Priya Nair', topic: 'Cloud fundamentals roadmap check-in', scheduled: 'Sep 12, 2026 · 3:00 PM', status: 'Completed', notes: 'Recommended AWS Cloud Practitioner path; follow up in 2 weeks.' },
+  { id: 'ms3', student: 'Rohan Mehta', topic: 'Internship offer discussion', scheduled: 'Sep 10, 2026 · 11:00 AM', status: 'Completed', notes: 'Placement-ready; discussed offer terms and onboarding prep.' },
+];

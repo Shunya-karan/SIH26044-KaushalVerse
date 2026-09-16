@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import {
@@ -14,8 +14,10 @@ import {
 import { MatchExplanation, SkillBadgeList } from "@/components/opportunities/OpportunityComponents";
 import { OPPORTUNITIES } from "@/data/mockOpportunities";
 import { CURRENT_STUDENT } from "@/data/mockStudents";
+import { useAuth } from "@/context/AuthContext";
 import { COMPETENCY_BLUEPRINT, MATCH_WEIGHTS } from "@/data/sihDemoData";
 import { useSIH } from "@/context/SIHContext";
+import { saveFile } from "@/lib/fileStorage";
 
 const STEPS = ["Confirm Profile", "Upload Resume", "Review", "Submit"];
 
@@ -24,11 +26,15 @@ export default function OpportunityDetails() {
   const navigate = useNavigate();
   const opportunity = OPPORTUNITIES.find((o) => o.id === id);
   const { skills } = useSIH();
+  const { user } = useAuth();
+  const student = user || CURRENT_STUDENT;
 
   const [applyOpen, setApplyOpen] = useState(false);
   const [step, setStep] = useState(0);
   const [resumeUploaded, setResumeUploaded] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [resumeFile, setResumeFile] = useState(null);
+  const resumeInputRef = useRef(null);
 
   if (!opportunity) {
     return (
@@ -52,6 +58,7 @@ export default function OpportunityDetails() {
     setStep(0);
     setResumeUploaded(false);
     setSubmitted(false);
+    setResumeFile(user?.resume || null);
   };
 
   const handleApplyOpen = () => {
@@ -176,24 +183,35 @@ export default function OpportunityDetails() {
                 <div className="space-y-3">
                   <p className="text-sm text-muted-foreground">Confirm your profile details before applying.</p>
                   <div className="rounded-lg border border-border p-4 space-y-1.5 text-sm">
-                    <p><span className="text-muted-foreground">Name:</span> {CURRENT_STUDENT.name}</p>
-                    <p><span className="text-muted-foreground">College:</span> {CURRENT_STUDENT.college}</p>
-                    <p><span className="text-muted-foreground">Branch:</span> {CURRENT_STUDENT.branch}</p>
-                    <p><span className="text-muted-foreground">CGPA:</span> {CURRENT_STUDENT.cgpa}</p>
+                    <p><span className="text-muted-foreground">Name:</span> {student.name}</p>
+                    <p><span className="text-muted-foreground">College:</span> {student.college || "Not added"}</p>
+                    <p><span className="text-muted-foreground">Branch:</span> {student.branch || "Not added"}</p>
+                    <p><span className="text-muted-foreground">CGPA:</span> {student.cgpa || "Not added"}</p>
                   </div>
                 </div>
               )}
 
               {step === 1 && (
                 <div className="space-y-3">
-                  <p className="text-sm text-muted-foreground">Upload your resume (demo upload — no file is actually transmitted).</p>
-                  <button
-                    onClick={() => { setResumeUploaded(true); toast.success("Resume uploaded"); }}
-                    className="flex w-full flex-col items-center gap-2 rounded-lg border-2 border-dashed border-border p-8 text-center hover:border-primary"
-                  >
+                  <p className="text-sm text-muted-foreground">Upload the resume you want to submit with this application.</p>
+                  <input ref={resumeInputRef} type="file" className="hidden" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    if (!['application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document'].includes(file.type)) return toast.error('Resume must be PDF, DOC or DOCX.');
+                    if (file.size > 10 * 1024 * 1024) return toast.error('Resume must be 10 MB or smaller.');
+                    try {
+                      const key = `application-resume:${user?.email?.toLowerCase() || 'student'}:${opportunity.id}`;
+                      await saveFile(key, file);
+                      setResumeFile({ storageKey: key, name: file.name, size: file.size, type: file.type });
+                      setResumeUploaded(true);
+                      toast.success('Resume uploaded successfully');
+                    } catch (error) { toast.error(error.message || 'Unable to save resume'); }
+                    e.target.value = '';
+                  }} />
+                  <button type="button" onClick={() => resumeInputRef.current?.click()} className="flex w-full flex-col items-center gap-2 rounded-lg border-2 border-dashed border-border p-8 text-center hover:border-primary">
                     {resumeUploaded ? <FileCheck className="h-8 w-8 text-success" /> : <Upload className="h-8 w-8 text-subtle" />}
-                    <span className="text-sm font-medium text-foreground">{resumeUploaded ? "resume_aarav_sharma.pdf uploaded" : "Click to upload your resume"}</span>
-                    <span className="text-xs text-muted-foreground">PDF, up to 5MB</span>
+                    <span className="text-sm font-medium text-foreground">{resumeFile?.name || 'Click to upload your resume'}</span>
+                    <span className="text-xs text-muted-foreground">PDF, DOC or DOCX · up to 10MB</span>
                   </button>
                 </div>
               )}
@@ -204,7 +222,7 @@ export default function OpportunityDetails() {
                   <div className="rounded-lg border border-border p-4 space-y-1.5">
                     <p><span className="text-muted-foreground">Role:</span> {opportunity.title}</p>
                     <p><span className="text-muted-foreground">Company:</span> {opportunity.company}</p>
-                    <p><span className="text-muted-foreground">Resume:</span> resume_aarav_sharma.pdf</p>
+                    <p><span className="text-muted-foreground">Resume:</span> {resumeFile?.name || user?.resume?.name || "Not selected"}</p>
                     <p><span className="text-muted-foreground">Match Score:</span> {opportunity.match}%</p>
                   </div>
                 </div>

@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import PublicLayout from "@/layouts/PublicLayout";
 import StudentLayout from "@/layouts/StudentLayout";
@@ -16,6 +16,8 @@ import Privacy from "@/pages/public/Privacy";
 import Terms from "@/pages/public/Terms";
 import Login from "@/pages/auth/Login";
 import Register from "@/pages/auth/Register";
+import GitHubOAuthCallback from "@/pages/auth/GitHubOAuthCallback";
+import ForgotPassword from "@/pages/auth/ForgotPassword";
 
 // Student pages
 import StudentDashboard from "@/pages/student/StudentDashboard";
@@ -32,6 +34,7 @@ import StudentNotifications from "@/pages/student/StudentNotifications";
 import SkillAssessment from "@/pages/student/SkillAssessment";
 import SkillPassport from "@/pages/student/SkillPassport";
 import SettingsPage from "@/pages/student/SettingsPage";
+import ProjectsPortfolio from "@/pages/student/ProjectsPortfolio";
 
 // Company pages
 import CompanyDashboard from "@/pages/company/CompanyDashboard";
@@ -59,11 +62,20 @@ import IndustryDemand from "@/pages/admin/IndustryDemand";
 import FacultyLayout from "@/layouts/FacultyLayout";
 import FacultyDashboard from "@/pages/faculty/FacultyDashboard";
 import FacultyStudents from "@/pages/faculty/FacultyStudents";
+import FacultySkillGaps from "@/pages/faculty/FacultySkillGaps";
+import FacultyAssessments from "@/pages/faculty/FacultyAssessments";
+import FacultyMentorship from "@/pages/faculty/FacultyMentorship";
 import FacultyCollaboration from "@/pages/faculty/FacultyCollaboration";
 import FacultyInternships from "@/pages/faculty/FacultyInternships";
 import FacultyAnalytics from "@/pages/faculty/FacultyAnalytics";
 import SkillVerification from "@/pages/faculty/SkillVerification";
 import NotFound from "@/pages/public/NotFound";
+import { useAuth } from "@/context/AuthContext";
+
+function DemoAssessmentOnly() {
+  const { user } = useAuth();
+  return user?.isDemo ? <SkillAssessment /> : <Navigate to="/student/skills" replace />;
+}
 
 export default function AppRoutes() {
   return (
@@ -81,6 +93,8 @@ export default function AppRoutes() {
       {/* Auth routes (no navbar/footer chrome) */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/github-callback" element={<GitHubOAuthCallback />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
 
       {/* Student routes */}
       <Route
@@ -94,7 +108,8 @@ export default function AppRoutes() {
         <Route path="dashboard" element={<StudentDashboard />} />
         <Route path="profile" element={<StudentProfile />} />
         <Route path="skills" element={<StudentSkills />} />
-        <Route path="assessment" element={<SkillAssessment />} />
+        <Route path="projects" element={<ProjectsPortfolio />} />
+        <Route path="assessment" element={<DemoAssessmentOnly />} />
         <Route path="skill-passport" element={<SkillPassport />} />
         <Route path="skill-gap" element={<SkillGapAnalysis />} />
         <Route path="roadmap" element={<LearningRoadmap />} />
@@ -140,10 +155,10 @@ export default function AppRoutes() {
       >
         <Route path="dashboard" element={<FacultyDashboard />} />
         <Route path="students" element={<FacultyStudents />} />
-        <Route path="skill-gaps" element={<FacultyAnalytics />} />
-        <Route path="assessments" element={<FacultyStudents />} />
+        <Route path="skill-gaps" element={<FacultySkillGaps />} />
+        <Route path="assessments" element={<FacultyAssessments />} />
         <Route path="skill-verification" element={<SkillVerification />} />
-        <Route path="mentorship" element={<FacultyStudents />} />
+        <Route path="mentorship" element={<FacultyMentorship />} />
         <Route path="internships" element={<FacultyInternships />} />
         <Route path="collaboration" element={<FacultyCollaboration />} />
         <Route path="analytics" element={<FacultyAnalytics />} />

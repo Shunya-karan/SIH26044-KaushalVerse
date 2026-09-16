@@ -1,5 +1,5 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -22,17 +22,28 @@ const schema = z.object({
 
 export default function Login() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const location = useLocation();
+  const { login, loginWithCredentials } = useAuth();
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(schema),
-    defaultValues: { email: "", password: "", remember: false },
+    defaultValues: { email: location.state?.registeredEmail || "", password: "", remember: false },
   });
 
-  const onSubmit = async () => {
-    await new Promise((r) => setTimeout(r, 600));
-    login("student");
-    toast.success("Logged in successfully (demo mode)");
-    navigate("/student/dashboard");
+  useEffect(() => {
+    if (location.state?.registeredEmail) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [location.state]);
+
+  const onSubmit = async (data) => {
+    await new Promise((r) => setTimeout(r, 450));
+    try {
+      const profile = loginWithCredentials(data.email, data.password);
+      toast.success(`Welcome back, ${profile.name.split(" ")[0]}!`);
+      navigate(profile.role === "admin" ? "/admin/overview" : `/${profile.role}/dashboard`);
+    } catch (error) {
+      toast.error(error.message || "Invalid email or password");
+    }
   };
 
   const demoLogin = (role) => {
@@ -50,6 +61,12 @@ export default function Login() {
             <h1 className="text-xl font-bold text-foreground">Welcome back</h1>
             <p className="mt-1 text-sm text-muted-foreground">Log in to continue to your KaushalVerse dashboard.</p>
 
+            {location.state?.registeredEmail && (
+              <div className="mt-4 rounded-lg border border-success/20 bg-success/5 px-3 py-2.5 text-sm text-foreground">
+                Account created successfully. Log in with your new account to continue.
+              </div>
+            )}
+
             <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4">
               <div className="space-y-1.5">
                 <Label htmlFor="email">Email</Label>
@@ -65,7 +82,7 @@ export default function Login() {
                 <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
                   <Checkbox {...register("remember")} /> Remember me
                 </label>
-                <Link to="/contact" className="text-sm font-medium text-primary hover:underline">Forgot password?</Link>
+                <Link to="/forgot-password" className="text-sm font-medium text-primary hover:underline">Forgot password?</Link>
               </div>
               <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting ? "Logging in..." : "Login"}

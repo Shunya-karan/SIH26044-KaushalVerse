@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Upload, FileCheck, Lightbulb, RefreshCcw } from "lucide-react";
 import { PageHeader } from "@/components/common/States";
@@ -9,18 +9,29 @@ import { Progress } from "@/components/ui/progress";
 import { DemoBadge } from "@/components/common/Misc";
 import { MatchScore } from "@/components/dashboard/DashboardWidgets";
 import { RESUME_ANALYSIS } from "@/data/mockRoadmap";
+import { useAuth } from "@/context/AuthContext";
+import { saveFile } from "@/lib/fileStorage";
 
 export default function ResumeIntelligence() {
   const [uploaded, setUploaded] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
+  const [fileName, setFileName] = useState("");
+  const fileInputRef = useRef(null);
+  const { user } = useAuth();
 
-  const handleUpload = () => {
-    setAnalyzing(true);
-    setTimeout(() => {
-      setAnalyzing(false);
-      setUploaded(true);
-      toast.success("Resume analyzed successfully");
-    }, 1200);
+  const handleUpload = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!['application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document'].includes(file.type)) return toast.error('Resume must be PDF, DOC or DOCX.');
+    if (file.size > 10 * 1024 * 1024) return toast.error('Resume must be 10 MB or smaller.');
+    try {
+      const key = `resume-intelligence:${user?.email?.toLowerCase() || 'student'}`;
+      await saveFile(key, file);
+      setFileName(file.name);
+      setAnalyzing(true);
+      setTimeout(() => { setAnalyzing(false); setUploaded(true); toast.success('Resume uploaded successfully'); }, 900);
+    } catch (error) { toast.error(error.message || 'Unable to save resume'); }
+    event.target.value = '';
   };
 
   return (
@@ -30,14 +41,15 @@ export default function ResumeIntelligence() {
       {!uploaded ? (
         <Card>
           <CardContent className="p-10">
+            <input ref={fileInputRef} type="file" className="hidden" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onChange={handleUpload} />
             <button
-              onClick={handleUpload}
+              onClick={() => fileInputRef.current?.click()}
               disabled={analyzing}
               className="flex w-full flex-col items-center gap-3 rounded-xl border-2 border-dashed border-border p-10 text-center hover:border-primary transition-colors disabled:opacity-60"
             >
               <Upload className="h-9 w-9 text-subtle" />
               <span className="font-medium text-foreground">{analyzing ? "Analyzing resume..." : "Upload your resume"}</span>
-              <span className="text-xs text-muted-foreground">PDF or DOCX, up to 5MB — AI Resume Analysis (Demo)</span>
+              <span className="text-xs text-muted-foreground">PDF, DOC or DOCX, up to 10MB</span>
             </button>
           </CardContent>
         </Card>
@@ -49,7 +61,7 @@ export default function ResumeIntelligence() {
                 <MatchScore score={RESUME_ANALYSIS.score} size="lg" />
                 <div>
                   <p className="font-semibold text-foreground">Resume Score: {RESUME_ANALYSIS.score}/100</p>
-                  <p className="text-sm text-muted-foreground flex items-center gap-1.5"><FileCheck className="h-3.5 w-3.5 text-success" /> resume_aarav_sharma.pdf</p>
+                  <p className="text-sm text-muted-foreground flex items-center gap-1.5"><FileCheck className="h-3.5 w-3.5 text-success" /> {fileName || user?.resume?.name || "Resume uploaded"}</p>
                 </div>
               </div>
               <Button variant="outline" onClick={() => setUploaded(false)}>

@@ -5,15 +5,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useSIH } from '@/context/SIHContext';
+import { useAuth } from '@/context/AuthContext';
+import { CURRENT_STUDENT } from '@/data/mockStudents';
 
 export default function SkillPassport() {
   const { skills, evaluationSaved } = useSIH();
+  const { user } = useAuth();
+  const student = user || CURRENT_STUDENT;
   const readiness = Math.round(skills.reduce((a, s) => a + s.score, 0) / skills.length);
   return <div>
     <PageHeader title="Digital Skill Passport" description="A portable, evidence-based view of what you can demonstrate — not only what you claim." />
     <Card className="mb-6 overflow-hidden"><CardContent className="p-6">
       <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-4"><div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary-soft"><UserRound className="h-7 w-7 text-primary" /></div><div><h2 className="text-xl font-bold">Aarav Sharma</h2><p className="text-sm text-muted-foreground">B.Sc. Computer Science · KaushalVerse Demo Institute</p><Badge className="mt-2" variant="outline">Healthcare Data Analyst Intern</Badge></div></div>
+        <div className="flex items-center gap-4"><div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary-soft"><UserRound className="h-7 w-7 text-primary" /></div><div><h2 className="text-xl font-bold">{student.name}</h2><p className="text-sm text-muted-foreground">{student.degree || "Student"} {student.branch ? `· ${student.branch}` : ""} · {student.college || "Institution not added"}</p><Badge className="mt-2" variant="outline">Healthcare Data Analyst Intern</Badge></div></div>
         <div className="min-w-44"><p className="text-xs text-muted-foreground">Overall readiness</p><p className="text-3xl font-bold">{readiness}%</p><Progress className="mt-2" value={readiness} /></div>
       </div>
     </CardContent></Card>

@@ -1,7 +1,8 @@
 import React from "react";
+import { useAuth } from "@/context/AuthContext";
 import {
   LayoutDashboard, User, Sparkles, Target, Map, Briefcase, FileText,
-  FileSearch, TrendingUp, Bell, Settings, ClipboardCheck, BadgeCheck,
+  FileSearch, TrendingUp, Bell, Settings, ClipboardCheck, BadgeCheck, FolderKanban,
 } from "lucide-react";
 import { DashboardShell } from "@/components/layout/DashboardShell";
 
@@ -10,6 +11,7 @@ const navItems = [
   { to: "/student/profile", label: "My Profile", icon: User },
   { to: "/student/skills", label: "My Skills", icon: Sparkles },
   { to: "/student/assessment", label: "Assessment", icon: ClipboardCheck },
+  { to: "/student/projects", label: "Projects / Portfolio", icon: FolderKanban },
   { to: "/student/skill-gap", label: "Skill Gap", icon: Target },
   { to: "/student/roadmap", label: "Learning Roadmap", icon: Map },
   { to: "/student/opportunities", label: "Opportunities", icon: Briefcase },
@@ -22,5 +24,7 @@ const navItems = [
 ];
 
 export default function StudentLayout() {
-  return <DashboardShell navItems={navItems} roleLabel="Student Portal" roleBadgeVariant="default" />;
+  const { user } = useAuth();
+  const visibleNavItems = user?.isDemo ? navItems : navItems.filter((item) => item.to !== "/student/assessment");
+  return <DashboardShell navItems={visibleNavItems} roleLabel="Student Portal" roleBadgeVariant="default" />;
 }
